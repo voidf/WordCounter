@@ -19,7 +19,8 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
 
-    int fontId = QFontDatabase::addApplicationFont("C:/Users/Irori/qtPro/QMLview/fonts/PingFang Regular.ttf");
+
+    int fontId = QFontDatabase::addApplicationFont("./fonts/PingFang Regular.ttf");
     QStringList fontFamilies = QFontDatabase::applicationFontFamilies(fontId);
     QFont font(fontFamilies.at(0));
     //font.setFamily("PingFang SC Medium");//设置全局字体
@@ -27,7 +28,7 @@ int main(int argc, char *argv[])
 
     QDataMgr data_mgr;
     engine.rootContext()->setContextProperty("DATAMGR", &data_mgr);
-
+    //engine.addImportPath( ":/qml/" );
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {

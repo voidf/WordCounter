@@ -18,7 +18,8 @@ QDataMgr::QDataMgr(QObject *parent) : QObject(parent)
     _rules << "\r";
     _rules << "\f";
     //_rules << "\0";
-    _rules << QString::fromLocal8Bit("以上为部分不可见字符，勿删");
+    //_rules << QString::fromLocal8Bit("以上为部分不可见字符，勿删");//MSVC
+    _rules << ("以上为部分不可见字符，勿删");//MinGW
     _rules << ",";
     _rules << ".";
     _rules << "(";

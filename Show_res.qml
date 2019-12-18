@@ -63,7 +63,7 @@ FileDialog {
         RowLayout{
             width: parent.width
             ToolButton{
-                icon.source: "file:///C:/Users/Irori/qtPro/QMLview/icons/application-export.png"//图标的绝对路径
+                icon.source: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAAASAAAAEgARslrPgAAAZJJREFUaN7tmTFPwzAQhd9VZaQFdtQNVjb4ISzwhxjhVyABVXeGzoSNGTUbKxJkBekxEKSQ2K6TKPZF8ht7be59Oft8SYGkpKQktSJ5SHJJsmB4FSRXJI9dHsVlHsALgIPI9/EDwKmIvJqCE8cPrxWYB4A9AFe2oKsCBYDd2O5LFSIybwvA2K7/GRUxep20vZA2JYDYmvp+0bYGh5LvHtRcgefed6CqoVySXJC8ITmtfT4nmXXOHwKgHFXyMsUDyZ1afEbySSVAaX5TS2OF0AqQs6k703JSB1CB2BggGpVQCTAoRCiAwSBCAvSB8D6JXaADs52XeS5F5Kse1HwS1yFuTZUYC8CfGtUeC8ASwIWIfPuj6trE7feqojbardEoOci6d0kFo0S/Fj80AMc+zNE+TpsebPSN0xWIfJv5TvkDbuIFx/pIuSV/5pPf+9Vi7NcqtvyuVlUAmNkuGFiftoBrFlpHNFzXoy3gWkJHADIA+5HNvwM4EZE3U9BagfIfkTMAK/wup9AqANy7zCclJSXF1w/yc7tuvvOVYwAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOS0xMi0xN1QxNjowMDowMCswMDowMIJ0LSUAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTktMTItMTdUMTY6MDA6MDArMDA6MDDzKZWZAAAAKHRFWHRzdmc6YmFzZS11cmkAZmlsZTovLy90bXAvbWFnaWNrLVc3U1VHQUJWVkcCWwAAAABJRU5ErkJggg"//图标的绝对路径
                 onClicked: {
                     exp_json()
                 }

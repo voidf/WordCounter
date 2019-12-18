@@ -19,7 +19,7 @@ ApplicationWindow{
         RowLayout{
             width: parent.width
             ToolButton{
-                icon.source: "file:///C:/Users/Irori/qtPro/QMLview/icons/plus.png"//图标的绝对路径
+                icon.source: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAAASAAAAEgARslrPgAAAFxJREFUaN7t17ENwCAMRUGc/Xd26qSiMV9R7gbAPNGYtQCAnJo6uLv7MahqZNY1FXCKgDQBaQLSBKQJSNveT967zfjFNnenz7+AgDT/gTQBaQLSBKQJSBMAAPzZDdSjDDbVGnaeAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDE5LTEyLTE1VDAzOjUzOjQ5KzAwOjAwDkYGSwAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxOS0xMi0xNVQwMzo1Mzo0OSswMDowMH8bvvcAAAAodEVYdHN2ZzpiYXNlLXVyaQBmaWxlOi8vL3RtcC9tYWdpY2steU9XTFhaeW6f5AdoAAAAAElFTkSuQmCC"//图标的绝对路径
                 onClicked: {
 
                     add_rules_view.create_r();

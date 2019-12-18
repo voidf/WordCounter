@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>Filedialog.qml</file>
+        <file>Create_rules.qml</file>
+        <file>Show_res.qml</file>
+    </qresource>
+    
+</RCC>

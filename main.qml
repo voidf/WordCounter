@@ -6,6 +6,9 @@ import QtQuick.Dialogs 1.2
 ApplicationWindow {
     property var cre : Qt.createComponent("Create_rules.qml").createObject(root);
     property var res : Qt.createComponent("Show_res.qml").createObject(root);
+    property var co: Qt.createComponent("Show_codec.qml").createObject(root);
+
+    property var upp : 1
     objectName: "root_view"
     title: "WordCounter 单词统计"
     visible: true
@@ -29,6 +32,22 @@ ApplicationWindow {
         if(!res)
             res=Qt.createComponent("Show_res.qml").createObject(root);
         res.show()
+    }
+
+    function create_codec(){
+        if(!co)
+            co=Qt.createComponent("Show_codec.qml").createObject(root);
+        co.show()
+    }
+
+    function ignore_Up(){
+        upp^=1;
+        if (upp){
+            split_pattern.text="考虑大小写"
+        }
+        else{
+            split_pattern.text="忽略大小写"
+        }
     }
 
     function create_file_dialog(){
@@ -96,7 +115,11 @@ Pane {
             },
             Button{
                 y:200;
-                text: qsTr("待扩展项");
+                text: qsTr("大小写");
+                onClicked:{
+                    DATAMGR.ignore_upper();
+                    root.ignore_Up();
+                }
             }
         ]
 
@@ -138,6 +161,9 @@ Pane {
         split_pattern.text=qsTr("错误:没有分割规则")
     }
 
+    function show_codec_selection(sel){
+        split_pattern.text=qsTr("编码设置为"+sel)
+    }
     TextField {
         id: split_pattern
         x: 256
@@ -164,6 +190,16 @@ Pane {
     Button{
         x: 360
         y: 283
+        text: qsTr("设置编码")
+        onClicked: {
+            create_codec()
+            DATAMGR.show_codec_list()
+        }
+    }
+
+    Button{
+        x: 360
+        y: 353
         text: qsTr("开始统计")
         onClicked: {
             create_res()

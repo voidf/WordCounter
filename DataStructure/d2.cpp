@@ -94,7 +94,7 @@ void errorPrint(Motto... a)
 template <typename... Motto>
 void fatalPrint(Motto... a)
 {
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 5); //Yukari(
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 5); //Murasaki
     cout << "[FATAL] ";
     info::print(a...);
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);

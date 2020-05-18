@@ -157,6 +157,55 @@ public:
             c.append(cur->val);
         return c;
     }
+    // friend MutableList operator+(MutableList &a, MutableList &b)
+    // {
+    //     MutableList c;
+    //     node *cur1 = a.__first__->nxt;
+    //     node *cur2 = b.__first__->nxt;
+    //     LL tmp2 = 0;
+    //     LL tmp1 = 0;
+    //     while (tmp1 < a.__len__ && tmp2 < b.__len__)
+    //     {
+    //         if (cur1->val > cur2->val)
+    //         {
+    //             c.append(cur2->val);
+    //             tmp2++;
+    //             cur2 = cur2->nxt;
+    //         }
+    //         else
+    //         {
+    //             c.append(cur1->val);
+    //             tmp1++;
+    //             cur1 = cur1->nxt;
+    //         }
+    //     }
+    //     for (; tmp1 < a.__len__; tmp1 += 1, cur1 = cur1->nxt)
+    //         c.append(cur1->val);
+    //     for (; tmp2 < a.__len__; tmp2 += 1, cur2 = cur2->nxt)
+    //         c.append(cur2->val);
+    //     return c;
+    // }
+    // void concate(MutableList &a)
+    // {
+    //     node *cur1 = a.__first__->nxt;
+    //     node *cur2 = this->__first__->nxt;
+    //     LL tmp2 = 0;
+    //     LL tmp1 = 0;
+    //     while (tmp1 < a.__len__ && tmp2 < this->__len__)
+    //     {
+    //         if (cur1->val > cur2->val)
+    //         {
+    //             tmp2++;
+    //             cur2 = cur2->nxt;
+    //         }
+    //         else
+    //         {
+    //             this->insert(tmp1,cur1->val);
+    //             tmp1++;
+    //             cur1 = cur1->nxt;
+    //         }
+    //     }
+    // }
 };
 char s[M];
 int main()
@@ -241,7 +290,7 @@ int main()
         cout << "[Info] MutableList demonstrate started...\n";
         while (Tag)
         {
-            cin>>s;
+            cin >> s;
             switch (bh(s))
             {
             case bh("quit"):
@@ -288,7 +337,7 @@ int main()
         cout << "Type quit then you can see the merged one in two ways\n";
         while (Tag)
         {
-            cin>>s;
+            cin >> s;
             switch (bh(s))
             {
             case bh("quit"):
@@ -328,7 +377,7 @@ int main()
                 cout << "Type 'quit' to go to next test.\n";
             }
         }
-        MutableList m = l+L;
+        MutableList m = l + L;
         cout << "[Info] MutableList merge by creating a new one\n";
         m.show();
         cout << "[Info] MutableList merge by modify the first one\n";

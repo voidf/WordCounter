@@ -6,7 +6,6 @@
 #include <QObject>
 #include <QFileDialog>
 #include <QApplication>
-#include <QTextCodec>
 
 #include <unordered_map>
 #include <iostream>
@@ -107,7 +106,6 @@ void QDataMgr::count_files()
 
         new_file.close();
 
-        QTextCodec::ConverterState state;
         QString content_str;
         bool is_conv = 0;
         //int min_invalid=0x7fffffff;
@@ -117,31 +115,7 @@ void QDataMgr::count_files()
             for (int i = 0; si; i++)
             {
                 si-=sizeof (codecli[i]);
-                QTextCodec *codec = QTextCodec::codecForName(codecli[i]);
-                QString text = codec->toUnicode(content.constData(), content.size(), &state);
-                //text.replace("\u0000","");
-                if (state.invalidChars > 0)
-                {
 
-                    //                if(state.remainingChars==0)
-                    //                {
-                    //                    content_str=text;
-                    //                    qDebug() << content_str;
-
-                    //                }
-                    qDebug() << codecli[i] << "\tinvalidChars:" << state.invalidChars;
-
-                    qDebug()<<state.remainingChars;
-
-                }
-                else
-                {
-                    content_str = text;
-                    is_conv = 1;
-                    _default_codec = codecli[i];
-                    break;
-                }
-                //codec=~QTextCodec();
 
             }
 
@@ -149,16 +123,13 @@ void QDataMgr::count_files()
             {
                 qDebug() << "Invalid codec!";
                 QByteArray tarr=_default_codec.toLatin1();
-                QTextCodec *codec = QTextCodec::codecForName(tarr.data());
-                content_str = codec->toUnicode(content.constData(), content.size(), &state);
+
             }
         }
         else
         {
             qDebug()<<"codec set!";
             QByteArray tarr=_default_codec.toLatin1();
-            QTextCodec *codec = QTextCodec::codecForName(tarr.data());
-            content_str = codec->toUnicode(content.constData(), content.size(), &state);
         }
 
 
@@ -166,17 +137,17 @@ void QDataMgr::count_files()
         if(is_ignore)
             content_str=content_str.toLower();
 
-        QStringList content_split_list = content_str.split(_rules.at(0), QString::SkipEmptyParts);
+        QStringList content_split_list = content_str.split(_rules.at(0), Qt::SkipEmptyParts);
 
         for (int i = 1; i < _rules.size(); i++)
         {
             QStringList tmp_strli;
             for (int j = 0; j < content_split_list.size(); j++)
             {
-                QStringList tmp_strli2 = content_split_list.at(j).split(_rules.at(i), QString::KeepEmptyParts);
+                QStringList tmp_strli2 = content_split_list.at(j).split(_rules.at(i), Qt::KeepEmptyParts);
                 if (tmp_strli2.size() > 1)
                 {
-                    tmp_strli << content_split_list.at(j).split(_rules.at(i), QString::SkipEmptyParts);
+                    tmp_strli << content_split_list.at(j).split(_rules.at(i), Qt::SkipEmptyParts);
                     content_split_list.removeAt(j);
                     j--;
                 }

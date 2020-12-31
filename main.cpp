@@ -15,16 +15,15 @@ int main(int argc, char *argv[])
     qputenv("QT_QUICK_CONTROLS_STYLE", "material");
     QQuickStyle::setStyle("Material"); //mdc牛逼
 
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
 
 
     int fontId = QFontDatabase::addApplicationFont("./fonts/PingFang Regular.ttf");
     QStringList fontFamilies = QFontDatabase::applicationFontFamilies(fontId);
-    QFont font(fontFamilies.at(0));
+//    QFont font(fontFamilies.at(0));
     //font.setFamily("PingFang SC Medium");//设置全局字体
-    app.setFont(font);
+//    app.setFont(font);
 
     QDataMgr data_mgr;
     engine.rootContext()->setContextProperty("DATAMGR", &data_mgr);

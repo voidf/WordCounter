@@ -1,21 +1,45 @@
 #include <bits/stdc++.h>
 #include <windows.h>
+#define LOGGER_LR_TEST
 namespace Logger
 {
     struct info
     {
         const static char separator = ' ';
         template <typename FIRST, typename... PACK>
-        static void print(FIRST first, PACK... params)
+        static void print(FIRST &first, PACK &... params) // 左值引用
         {
+#ifdef LOGGER_LR_TEST
+            std::cout << "[L]";
+#endif
             std::cout << first << separator;
             print(params...);
+        }
+        template <typename FIRST, typename... PACK>
+        static void print(FIRST &&first, PACK &&... params) // 右值引用
+        {
+#ifdef LOGGER_LR_TEST
+            std::cout << "[R]";
+#endif
+            std::cout << first << separator;
+            print(std::forward<PACK>(params)...);
         }
 
         //重载函数版本，递归结束条件
         template <typename T>
-        static void print(T end)
+        static void print(T &end) // 上面用左值引用这里就写&
         {
+#ifdef LOGGER_LR_TEST
+            std::cout << "[L]";
+#endif
+            std::cout << end << std::endl;
+        }
+        template <typename T>
+        static void print(T &&end) // 上面用右值引用这里就写&&
+        {
+#ifdef LOGGER_LR_TEST
+            std::cout << "[R]";
+#endif
             std::cout << end << std::endl;
         }
     };
@@ -110,4 +134,4 @@ namespace Logger
         info::print(a...);
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
     }
-} // namespace colorPrint
+} // namespace Logger

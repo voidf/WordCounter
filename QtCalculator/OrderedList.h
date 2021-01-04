@@ -37,7 +37,7 @@ namespace OrderedList
         Tp begin() { return this->_allocator._start; }
         Tp end() { return this->_allocator._finish; }
         T front() { return *(this->_allocator._start); }
-        T back() { return *(this->_allocator._finish); }
+        T back() { return *(this->_allocator._finish - 1); }
         size_type size() { return size_type(this->_allocator._finish - this->_allocator._start); }
         bool empty() { return this->_allocator._finish == this->_allocator._start; }
 

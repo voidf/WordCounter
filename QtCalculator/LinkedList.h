@@ -182,48 +182,48 @@ namespace LinkedList
 
 } // namespace LinkedList
 
-#include <iostream>
+// #include <iostream>
 
-struct SB
-{
-    long long ii;
-    int sbc;
-    SB() {}
-    SB(long long a, int b) : ii(a), sbc(b) {}
-};
+// struct SB
+// {
+//     long long ii;
+//     int sbc;
+//     SB() {}
+//     SB(long long a, int b) : ii(a), sbc(b) {}
+// };
 
-signed main()
-{
-    try
-    {
-        LinkedList::LinkedList<SB> ol;
-        ol.direct_append(1919810LL, 1);
-        ol.direct_append(1919810LL, 14);
-        ol.direct_append(1919810LL, 5);
-        ol.direct_append(1919810LL, 14);
-        // for (auto i : ol)
-        // std::cout << i << std::endl;
-        while (!ol.empty())
-            std::cout << ol.pop().sbc << std::endl;
-        // ol.pop();
-        ol.direct_append(1145141LL, 1981);
-        ol.direct_append(1145142LL, 1982);
-        ol.direct_append(1145143LL, 1983);
-        ol.direct_append(1145144LL, 1984);
-        ol.direct_append_left(1564LL, 1565);
-        // std::cout << ol[0].sbc << std::endl;
-        // for (auto &[a, b] : ol)
-        //     b = 1;
-        for (auto a : ol)
-            std::cout << a.ii << '\t' << a.sbc << std::endl;
-        while (!ol.empty())
-            std::cout << ol.pop_left().sbc << std::endl;
-    }
-    catch (const std::string &e)
-    {
-        std::cerr << e << '\n';
-        // std::cerr << e.where() << '\n';
-    }
+// signed main()
+// {
+//     try
+//     {
+//         LinkedList::LinkedList<SB> ol;
+//         ol.direct_append(1919810LL, 1);
+//         ol.direct_append(1919810LL, 14);
+//         ol.direct_append(1919810LL, 5);
+//         ol.direct_append(1919810LL, 14);
+//         // for (auto i : ol)
+//         // std::cout << i << std::endl;
+//         while (!ol.empty())
+//             std::cout << ol.pop().sbc << std::endl;
+//         // ol.pop();
+//         ol.direct_append(1145141LL, 1981);
+//         ol.direct_append(1145142LL, 1982);
+//         ol.direct_append(1145143LL, 1983);
+//         ol.direct_append(1145144LL, 1984);
+//         ol.direct_append_left(1564LL, 1565);
+//         // std::cout << ol[0].sbc << std::endl;
+//         // for (auto &[a, b] : ol)
+//         //     b = 1;
+//         for (auto a : ol)
+//             std::cout << a.ii << '\t' << a.sbc << std::endl;
+//         while (!ol.empty())
+//             std::cout << ol.pop_left().sbc << std::endl;
+//     }
+//     catch (const std::string &e)
+//     {
+//         std::cerr << e << '\n';
+//         // std::cerr << e.where() << '\n';
+//     }
 
-    return 0;
-}
+//     return 0;
+// }

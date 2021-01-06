@@ -1,5 +1,5 @@
-// #include<>
-// #include <stl_vector.h>
+#ifndef LINKLIST_IMPORTED
+#define LINKLIST_IMPORTED
 #include <memory>
 #include <new.h>
 // #include <bits/stdc++.h>
@@ -181,49 +181,59 @@ namespace LinkedList
     };
 
 } // namespace LinkedList
+#endif
+#ifndef IMPORT_MODULE
+#include <iostream>
 
-// #include <iostream>
+struct SB
+{
+    long long ii;
+    int sbc;
+    SB() {}
+    SB(long long a, int b) : ii(a), sbc(b) {}
+};
 
-// struct SB
-// {
-//     long long ii;
-//     int sbc;
-//     SB() {}
-//     SB(long long a, int b) : ii(a), sbc(b) {}
-// };
+signed main()
+try
+{
+    LinkedList::LinkedList<SB> queue; // 手写双向链表，可以用来实现队列和栈
+    queue.direct_append(1919810LL, 1);
+    queue.direct_append(1919810LL, 14);
+    queue.direct_append(1919810LL, 5);
+    queue.direct_append(1919810LL, 14);
+    // for (auto i : queue)
+    // std::cout << i << std::endl;
+    while (!queue.empty())
+        std::cout << queue.pop().sbc << std::endl;
+    // queue.pop();
+    queue.direct_append(1145141LL, 1981);
+    queue.direct_append(1145142LL, 1982);
+    queue.direct_append(1145143LL, 1983);
+    queue.direct_append(1145144LL, 1984);
+    queue.direct_append_left(1564LL, 1565);
+    // std::cout << queue[0].sbc << std::endl;
+    // for (auto &[a, b] : queue)
+    //     b = 1;
+    for (auto a : queue)
+        std::cout << a.ii << '\t' << a.sbc << std::endl;
+    while (!queue.empty())
+        std::cout << queue.pop_left().sbc << std::endl;
+    LinkedList::LinkedList<int> stack;
+    stack.direct_append(1);
+    stack.direct_append(9);
+    stack.direct_append(1);
+    stack.direct_append(9);
+    stack.direct_append(8);
+    stack.direct_append(1);
+    stack.direct_append(0);
+    while (!stack.empty())
+        std::cout << stack.pop() << std::endl;
 
-// signed main()
-// {
-//     try
-//     {
-//         LinkedList::LinkedList<SB> ol;
-//         ol.direct_append(1919810LL, 1);
-//         ol.direct_append(1919810LL, 14);
-//         ol.direct_append(1919810LL, 5);
-//         ol.direct_append(1919810LL, 14);
-//         // for (auto i : ol)
-//         // std::cout << i << std::endl;
-//         while (!ol.empty())
-//             std::cout << ol.pop().sbc << std::endl;
-//         // ol.pop();
-//         ol.direct_append(1145141LL, 1981);
-//         ol.direct_append(1145142LL, 1982);
-//         ol.direct_append(1145143LL, 1983);
-//         ol.direct_append(1145144LL, 1984);
-//         ol.direct_append_left(1564LL, 1565);
-//         // std::cout << ol[0].sbc << std::endl;
-//         // for (auto &[a, b] : ol)
-//         //     b = 1;
-//         for (auto a : ol)
-//             std::cout << a.ii << '\t' << a.sbc << std::endl;
-//         while (!ol.empty())
-//             std::cout << ol.pop_left().sbc << std::endl;
-//     }
-//     catch (const std::string &e)
-//     {
-//         std::cerr << e << '\n';
-//         // std::cerr << e.where() << '\n';
-//     }
-
-//     return 0;
-// }
+    return 0;
+}
+catch (const std::string &e)
+{
+    std::cerr << e << '\n';
+    return 1;
+}
+#endif

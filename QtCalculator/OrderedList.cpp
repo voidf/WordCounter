@@ -1,12 +1,12 @@
-// #include<>
-// #include <stl_vector.h>
+#ifndef ORDEREDLIST_IMPORTED
+#define ORDEREDLIST_IMPORTED
 #include <memory>
 #include <new.h>
 // #include <bits/stdc++.h>
 // vector<int>v;
 namespace OrderedList
 {
-    const int _block_size = 0x1; // 搬家阈值
+    const int _block_size = 0x1000; // 搬家阈值
     template <typename T, typename A = std::allocator<T>>
     struct OrderedList
     {
@@ -101,36 +101,44 @@ namespace OrderedList
     };
 
 } // namespace OrderedList
+#endif
+#ifndef IMPORT_MODULE
+#include <iostream>
 
-// #include <iostream>
+struct SB
+{
+    long long ii;
+    int sbc;
+    SB(long long a, int b) : ii(a), sbc(b) {}
+};
 
-// struct SB
-// {
-//     long long ii;
-//     int sbc;
-//     SB(long long a, int b) : ii(a), sbc(b) {}
-// };
-
-// signed main()
-// {
-//     OrderedList::OrderedList<SB> ol;
-//     ol.direct_append(1919810LL, 1);
-//     ol.direct_append(1919810LL, 14);
-//     ol.direct_append(1919810LL, 5);
-//     ol.direct_append(1919810LL, 14);
-//     // for (auto i : ol)
-//     // std::cout << i << std::endl;
-//     while (!ol.empty())
-//         std::cout << ol.pop().sbc << std::endl;
-//     ol.direct_append(114514LL, 198);
-//     ol.direct_append(114514LL, 198);
-//     ol.direct_append(114514LL, 198);
-//     ol.direct_append(114514LL, 198);
-//     ol[0].sbc = 485964;
-//     std::cout << ol[0].sbc << std::endl;
-//     for (auto &[a, b] : ol)
-//         b = 1;
-//     for (auto &[a, b] : ol)
-//         std::cout << a << '\t' << b << std::endl;
-//     return 0;
-// }
+signed main()
+try
+{
+    OrderedList::OrderedList<SB> stack; // 手造顺序表（搬家表），可以实现栈
+    stack.direct_append(1919810LL, 1);
+    stack.direct_append(1919810LL, 14);
+    stack.direct_append(1919810LL, 5);
+    stack.direct_append(1919810LL, 14);
+    // for (auto i : stack)
+    // std::cout << i << std::endl;
+    while (!stack.empty())
+        std::cout << stack.pop().sbc << std::endl;
+    stack.direct_append(114514LL, 198);
+    stack.direct_append(114514LL, 198);
+    stack.direct_append(114514LL, 198);
+    stack.direct_append(114514LL, 198);
+    stack[0].sbc = 485964;
+    std::cout << stack[0].sbc << std::endl;
+    for (auto &[a, b] : stack)
+        b = 1;
+    for (auto &[a, b] : stack)
+        std::cout << a << '\t' << b << std::endl;
+    return 0;
+}
+catch (const std::string &e)
+{
+    std::cerr << e << '\n';
+    return 1;
+}
+#endif

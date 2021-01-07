@@ -1,14 +1,14 @@
 #ifndef BST_IMPORTED
 #define BST_IMPORTED
+#define ENABLE_FFT // 有点危的FFT乘法
 
-// #define ENABLE_FFT // 有点危的FFT乘法
-
+#include <iostream>
 #include <bitset>
 #include <string>
 #include <complex>
 #include <math.h>
-#include <iostream>
 #include <cstring>
+#include <vector>
 #if __cplusplus >= 201907L
 #include <numbers>
 constexpr double pi = std::numbers::pi;
@@ -29,9 +29,12 @@ namespace BigIntegerDomain
         BigInteger operator<<(Args args) { return (BigInteger)((std::bitset<siz>)*this << args); }
         template <typename Args>
         BigInteger operator>>(Args args) { return (BigInteger)((std::bitset<siz>)*this >> args); }
+        template <typename Args>
+        BigInteger operator^(Args args) { return (BigInteger)((std::bitset<siz>)*this ^ args); }
+        BigInteger operator~() { return (BigInteger) ~(std::bitset<siz>)*this; }
         bool operator<(BigInteger &b)
         {
-            for (auto i = this->size() - 1; i >= 0; i--)
+            for (int i = this->size() - 1; i >= 0; i--)
                 if (this->test(i) != b[i])
                     return this->test(i) < b[i];
             return 0;
@@ -59,7 +62,7 @@ namespace BigIntegerDomain
             if (this->none())
                 return b;
             bool c = 0, t;
-            for (auto i = 0; i < this->size(); i++)
+            for (int i = 0; i < this->size(); i++)
             {
                 t = c ^ this->test(i) ^ b.test(i);
                 c = (this->test(i) & c) | (c & b.test(i)) | (this->test(i) & b.test(i));
@@ -67,9 +70,15 @@ namespace BigIntegerDomain
             }
             return b;
         }
+        double operator+(double b) { return this->toDouble() + b; }
+        friend double operator+(double b, BigInteger &a) { return a.toDouble() + b; }
+        friend double operator+(double b, BigInteger &&a) { return a.toDouble() + b; }
         BigInteger &operator+=(BigInteger &b) { return (*this) = (*this) + b; }
-        BigInteger operator-() { return BigInteger<siz>(1) + ~(*this); }
+        BigInteger operator-() { return BigInteger(1) + ~(*this); }
         BigInteger operator-(BigInteger &b) { return b.any() ? (*this + (-b)) : *this; }
+        double operator-(double b) { return this->toDouble() - b; }
+        friend double operator-(double b, BigInteger &a) { return b - a.toDouble(); }
+        friend double operator-(double b, BigInteger &&a) { return b - a.toDouble(); }
         BigInteger &operator-=(BigInteger &b) { return (*this) = (*this) - b; }
         BigInteger &operator-=(BigInteger &&b) { return (*this) = (*this) - b; }
         BigInteger operator*(BigInteger b)
@@ -85,29 +94,35 @@ namespace BigIntegerDomain
             }
             return c;
 #else
-            return FFTBigNumMul(*this, b);
+            return (BigInteger)FFTBigNumMul(*this, b);
 #endif
         }
+        double operator*(double b) { return this->toDouble() * b; }
+        friend double operator*(double b, BigInteger &a) { return a.toDouble() * b; }
+        friend double operator*(double b, BigInteger &&a) { return a.toDouble() * b; }
         BigInteger &operator*=(const BigInteger &b) { return (*this) = (*this) * b; }
-        std::pair<BigInteger, BigInteger> divide(BigInteger a, BigInteger &b)
+        static std::pair<BigInteger, BigInteger> divide(BigInteger a, BigInteger &b)
         {
             BigInteger c(0);
             int i = 0;
-            while ((BigInteger)(b << (i + 1)) <= a)
+            while ((b << (i + 1)) <= a)
                 ++i;
             while (i >= 0)
             {
-                if (a >= (BigInteger)(b << i))
-                    a -= (BigInteger)(b << i), c.set(i, 1);
+                if (a >= (b << i))
+                    a -= (b << i), c.set(i, 1);
                 i--;
             }
             return std::make_pair(c, a);
         }
         BigInteger operator/(BigInteger &b) { return divide(*this, b).first; }
+        double operator/(double b) { return this->toDouble() / b; }
+        friend double operator/(double b, BigInteger &a) { return b / a.toDouble(); }
+        friend double operator/(double b, BigInteger &&a) { return b / a.toDouble(); }
         BigInteger &operator/=(BigInteger &b) { return (*this) = (*this) / b; }
         BigInteger operator%(BigInteger &b) { return divide(*this, b).second; }
         BigInteger &operator%=(BigInteger &b) { return (*this) = (*this) / b; }
-        BigInteger &fromString(std::string &s)
+        BigInteger &fromDecimal(std::string &s)
         {
             this->reset();
             bool minus_tag = false;
@@ -116,13 +131,13 @@ namespace BigIntegerDomain
                 if (c == '-')
                     minus_tag = true;
                 else if (isdigit(c))
-                    (*this) = (BigInteger)((*this) << 3) + (BigInteger)((*this) << 1) + (c ^ 0x30);
+                    (*this) = ((*this) << 3) + ((*this) << 1) + (c ^ 0x30);
             }
             if (minus_tag)
                 *this = -(*this);
             return *this;
         }
-        BigInteger &fromString(std::string &&s)
+        BigInteger &fromDecimal(std::string &&s)
         {
             this->reset();
             bool minus_tag = false;
@@ -131,11 +146,56 @@ namespace BigIntegerDomain
                 if (c == '-')
                     minus_tag = true;
                 else if (isdigit(c))
-                    (*this) = (BigInteger)((*this) << 3) + (BigInteger)((*this) << 1) + (c ^ 0x30);
+                    (*this) = ((*this) << 3) + ((*this) << 1) + (c ^ 0x30);
             }
             if (minus_tag)
                 *this = -(*this);
             return *this;
+        }
+        std::string toDecimal() // 瓶颈
+        {
+            if (this->none())
+                return std::string("0");
+            BigInteger tmp(*this);
+            std::string output;
+            if (this->test(this->size() - 1))
+            {
+                output.push_back('-');
+                tmp = -tmp;
+            }
+
+            std::vector<BigInteger> v;
+            for (BigInteger y(1); y <= tmp; y *= 10)
+            {
+                v.push_back(y);
+            }
+
+            while (!v.empty())
+            {
+                char t = '0';
+                while (tmp >= (v.back() << 2))
+                    tmp -= v.back() << 2, t += 4;
+                while (tmp >= (v.back() << 1))
+                    tmp -= v.back() << 1, t += 2;
+                while (tmp >= v.back())
+                    tmp -= v.back(), t++;
+                output.push_back(t); //插1个t这个字符
+                v.pop_back();
+            }
+            return output;
+        }
+
+        double toDouble()
+        {
+            double res, flg = 1.0;
+
+            BigInteger tmp(*this);
+            if (tmp.test(tmp.size() - 1))
+                flg = -1.0, tmp = -tmp;
+            for (int i = std::min(1023, (int)this->size() - 1); i >= 0; i--)
+                if (tmp.test(i))
+                    res += pow(2.0, i);
+            return res * flg;
         }
 
         static BigInteger FFTBigNumMul(const BigInteger &A, const BigInteger &B)
@@ -194,7 +254,7 @@ namespace BigIntegerDomain
             delete[] a;
             delete[] b;
             delete[] rev;
-            return c;
+            return (BigInteger)c;
         }
 
         static void FFT(std::complex<double> a[], LL n, LL inv, LL rev[]) // FFT系列没有外部依赖数组，不用打ifdef
@@ -216,33 +276,57 @@ namespace BigIntegerDomain
                 }
             }
         }
+        friend std::ostream &operator<<(std::ostream &o, BigInteger &b)
+        {
+            o << b.toDecimal();
+            return o;
+        }
+        friend std::ostream &operator<<(std::ostream &o, BigInteger &&b)
+        {
+            o << b.toDecimal();
+            return o;
+        }
+        // template <typename T>
+        friend std::istream &operator>>(std::istream &o, BigInteger &b)
+        {
+            std::string i;
+            o >> i;
+            b.fromDecimal(i);
+            return o;
+        }
     };
 } // namespace BigIntegerDomain
 #endif
 
 #ifndef IMPORT_MODULE
-#include <iostream>
+// #include <iostream>
+using B = BigIntegerDomain::BigInteger<3000>;
+// auto a = new B;
+// auto b = new B;
+B a, b;
+#include <iomanip>
 signed main()
 try
 {
-    using namespace BigIntegerDomain;
-    using B = BigInteger<100>;
-    B a(114514), b(1919810);
-    B c = a << 2;
-    c <<= 2;
-    c += b;
+    // using namespace BigIntegerDomain;
+    // B a(114514), b(1919810);
+    // B c = a << 2;
+    // c <<= 2;
+    // c += b;
     // a += b;
     // bool tm = (c <= b);
     // std::cout << tm;
-    std::cout << a.fromString(std::string("-345125354263")) << std::endl;
+    // std::ios::sync_with_stdio(0);
+    std::cin >> a >> b;
+    std::cout << a - b << std::endl;
     // for (int i = a.size() - 1; i >= 0; i--) // auto 给推成无符号了草
     // std::cout << a[i];
-    std::cout << std::endl;
+    // std::cout << B(1000).toDecimal() << std::endl;
     return 0;
 }
-catch (const std::string &e)
+catch (const std::exception &e)
 {
-    std::cerr << e << '\n';
+    std::cerr << e.what() << '\n';
     return 1;
 }
 #endif

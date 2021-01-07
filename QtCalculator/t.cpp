@@ -3,14 +3,12 @@
 #include <bits/extc++.h>
 
 using namespace std;
-bitset<10> b1(3);
-bitset<20> b2;
-bitset<20> b3(b2);
+string s;
 signed main()
 try
 {
-
-    cout<<b2 << endl;
+    s.append("114514");
+    cout << pow(2.0,1023) << endl;
     return 0;
 }
 catch (exception &e)

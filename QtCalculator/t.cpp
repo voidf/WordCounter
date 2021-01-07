@@ -5,13 +5,12 @@
 using namespace std;
 bitset<10> b1(3);
 bitset<20> b2;
-bitset<20> b3(b1);
+bitset<20> b3(b2);
 signed main()
 try
 {
-    for (auto i : b2)
-        cout << i;
-    cout << endl;
+
+    cout<<b2 << endl;
     return 0;
 }
 catch (exception &e)

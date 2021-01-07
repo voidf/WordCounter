@@ -16,36 +16,34 @@ constexpr double pi = std::numbers::pi;
 constexpr double pi = acos(-1);
 #endif
 using LL = long long;
-namespace BigInteger
+namespace BigIntegerDomain
 {
-    template <std::size_t siz>
+    template <size_t siz>
     struct BigInteger : std::bitset<siz>
     {
         // std::bitset<siz> _bits;
         template <typename... Args>
         BigInteger(Args &&... args) : std::bitset<siz>(std::forward<Args>(args)...) {}
-        // BigInteger(Args &&... args) { _bits = std::bitset<siz>(std::forward<Args>(args)...) }
-        // BigInteger(Args &&... args):std::bitset<siz>(std::forward<Args>(args)...){}
-        // BigInteger(int i) : std::bitset<siz>(i) {}
-        // BigInteger(long long i) : std::bitset<siz>(i) {}
-        // BigInteger(std::string &s) : std::bitset<siz>(s) {}
-        // BigInteger(std::string &&s) : std::bitset<siz>(s) {}
-        // BigInteger(const char s[]) : std::bitset<siz>(s) {}
-        bool operator<(BigInteger &&b)
+
+        // template <typename Args>
+        // BigInteger operator<<(Args args) { return (BigInteger)(*this << args); }
+        // template <typename Args>
+        // BigInteger operator>>(Args args) { return (BigInteger)(*this >> args); }
+        bool operator<(BigInteger &b)
         {
             for (auto i = this->size() - 1; i >= 0; i--)
                 if (this->test(i) != b[i])
                     return this->test(i) < b[i];
             return 0;
         }
-        bool operator>(BigInteger &&b)
+        bool operator>(BigInteger &b)
         {
             for (int i = this->size() - 1; i >= 0; --i)
                 if (this->test(i) != b[i])
                     return this->test(i) > b[i];
             return 0;
         }
-        template <typename T>
+        // template <typename T>
         // BigInteger operator<<(T x) { return static_cast<BigInteger>((*this) << x); }
         bool operator<=(BigInteger &b)
         {
@@ -70,8 +68,8 @@ namespace BigInteger
             return b;
         }
         BigInteger &operator+=(const BigInteger &b) { return (*this) = (*this) + b; }
-        BigInteger operator-() { return BigInteger(1) + ~(*this); }
-        BigInteger operator-(const BigInteger &b) { return b.any() ? (*this ^ b) - ((~*this & b) << 1) : *this; }
+        BigInteger operator-() { return BigInteger<siz>(1) + ~(*this); }
+        BigInteger operator-(const BigInteger &b) { return b.any() ? (*this + (-b)) : *this; }
         BigInteger &operator-=(const BigInteger &b) { return (*this) = (*this) - b; }
         BigInteger operator*(BigInteger b)
         {
@@ -90,15 +88,15 @@ namespace BigInteger
 #endif
         }
         BigInteger &operator*=(const BigInteger &b) { return (*this) = (*this) * b; }
-        static std::pair<BigInteger, BigInteger> divide(BigInteger a, const BigInteger &b)
+        std::pair<BigInteger, BigInteger> divide(BigInteger a, BigInteger &b)
         {
             BigInteger c(0);
             int i = 0;
-            while ((b << (i + 1)) <= a)
+            while ((BigInteger)(b << (i + 1)) <= a)
                 ++i;
             while ((i--) >= 0)
-                if (a >= (b << i))
-                    a -= b << i, c.set(i, 1);
+                if (a >= (BigInteger)(b << i))
+                    a -= (BigInteger)(b << i), c.set(i, 1);
             return std::make_pair(c, a);
         }
 
@@ -181,23 +179,26 @@ namespace BigInteger
             }
         }
     };
-} // namespace BigInteger
+} // namespace BigIntegerDomain
 #endif
 
 #ifndef IMPORT_MODULE
 #include <iostream>
-
-signed
-main()
+signed main()
 try
 {
-    using B = BigInteger::BigInteger<50>;
+    using namespace BigIntegerDomain;
+    using B = BigInteger<50>;
     B a(114514), b(1919810);
-    B c(a);
+    B c = a << 2;
+    c <<= 2;
+    c += b;
     // a += b;
-    std::cout << a*b << std::endl;
-    for (int i = a.size() - 1; i >= 0; i--) // auto 给推成无符号了草
-        std::cout << a[i];
+    // bool tm = (c <= b);
+    // std::cout << tm;
+    std::cout << a.divide(a, b).first << std::endl;
+    // for (int i = a.size() - 1; i >= 0; i--) // auto 给推成无符号了草
+    // std::cout << a[i];
     std::cout << std::endl;
     return 0;
 }

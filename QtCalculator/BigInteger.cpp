@@ -25,10 +25,10 @@ namespace BigIntegerDomain
         template <typename... Args>
         BigInteger(Args &&... args) : std::bitset<siz>(std::forward<Args>(args)...) {}
 
-        // template <typename Args>
-        // BigInteger operator<<(Args args) { return (BigInteger)(*this << args); }
-        // template <typename Args>
-        // BigInteger operator>>(Args args) { return (BigInteger)(*this >> args); }
+        template <typename Args>
+        BigInteger operator<<(Args args) { return (BigInteger)((std::bitset<siz>)*this << args); }
+        template <typename Args>
+        BigInteger operator>>(Args args) { return (BigInteger)((std::bitset<siz>)*this >> args); }
         bool operator<(BigInteger &b)
         {
             for (auto i = this->size() - 1; i >= 0; i--)
@@ -67,10 +67,11 @@ namespace BigIntegerDomain
             }
             return b;
         }
-        BigInteger &operator+=(const BigInteger &b) { return (*this) = (*this) + b; }
+        BigInteger &operator+=(BigInteger &b) { return (*this) = (*this) + b; }
         BigInteger operator-() { return BigInteger<siz>(1) + ~(*this); }
-        BigInteger operator-(const BigInteger &b) { return b.any() ? (*this + (-b)) : *this; }
-        BigInteger &operator-=(const BigInteger &b) { return (*this) = (*this) - b; }
+        BigInteger operator-(BigInteger &b) { return b.any() ? (*this + (-b)) : *this; }
+        BigInteger &operator-=(BigInteger &b) { return (*this) = (*this) - b; }
+        BigInteger &operator-=(BigInteger &&b) { return (*this) = (*this) - b; }
         BigInteger operator*(BigInteger b)
         {
 #ifndef ENABLE_FFT
@@ -94,10 +95,47 @@ namespace BigIntegerDomain
             int i = 0;
             while ((BigInteger)(b << (i + 1)) <= a)
                 ++i;
-            while ((i--) >= 0)
+            while (i >= 0)
+            {
                 if (a >= (BigInteger)(b << i))
                     a -= (BigInteger)(b << i), c.set(i, 1);
+                i--;
+            }
             return std::make_pair(c, a);
+        }
+        BigInteger operator/(BigInteger &b) { return divide(*this, b).first; }
+        BigInteger &operator/=(BigInteger &b) { return (*this) = (*this) / b; }
+        BigInteger operator%(BigInteger &b) { return divide(*this, b).second; }
+        BigInteger &operator%=(BigInteger &b) { return (*this) = (*this) / b; }
+        BigInteger &fromString(std::string &s)
+        {
+            this->reset();
+            bool minus_tag = false;
+            for (auto c : s)
+            {
+                if (c == '-')
+                    minus_tag = true;
+                else if (isdigit(c))
+                    (*this) = (BigInteger)((*this) << 3) + (BigInteger)((*this) << 1) + (c ^ 0x30);
+            }
+            if (minus_tag)
+                *this = -(*this);
+            return *this;
+        }
+        BigInteger &fromString(std::string &&s)
+        {
+            this->reset();
+            bool minus_tag = false;
+            for (auto c : s)
+            {
+                if (c == '-')
+                    minus_tag = true;
+                else if (isdigit(c))
+                    (*this) = (BigInteger)((*this) << 3) + (BigInteger)((*this) << 1) + (c ^ 0x30);
+            }
+            if (minus_tag)
+                *this = -(*this);
+            return *this;
         }
 
         static BigInteger FFTBigNumMul(const BigInteger &A, const BigInteger &B)
@@ -153,9 +191,9 @@ namespace BigIntegerDomain
                 // std::cout << static_cast<int>(a[A.size()+B.size()-1-i].real()) << std::endl;
                 c[i] = static_cast<int>(a[A.size() + B.size() - 2 - i].real()); // +0.5即四舍五入
             }
-            // delete[] a;
-            // delete[] b;
-            // delete[] rev;
+            delete[] a;
+            delete[] b;
+            delete[] rev;
             return c;
         }
 
@@ -188,7 +226,7 @@ signed main()
 try
 {
     using namespace BigIntegerDomain;
-    using B = BigInteger<50>;
+    using B = BigInteger<100>;
     B a(114514), b(1919810);
     B c = a << 2;
     c <<= 2;
@@ -196,7 +234,7 @@ try
     // a += b;
     // bool tm = (c <= b);
     // std::cout << tm;
-    std::cout << a.divide(a, b).first << std::endl;
+    std::cout << a.fromString(std::string("-345125354263")) << std::endl;
     // for (int i = a.size() - 1; i >= 0; i--) // auto 给推成无符号了草
     // std::cout << a[i];
     std::cout << std::endl;

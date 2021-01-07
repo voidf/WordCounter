@@ -5,6 +5,7 @@
 using namespace std;
 bitset<10> b1(3);
 bitset<20> b2;
+bitset<20> b3(b1);
 signed main()
 try
 {

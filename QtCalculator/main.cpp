@@ -16,8 +16,9 @@
 //#include "BST.cpp"
 //#include "LinkedList.cpp"
 //#include "OrderedList.cpp"
-
-
+#include "QmlInterface.h"
+extern QObject* rootobj;
+QObject* rootobj;
 int main(int argc, char *argv[])
 try
 {
@@ -29,6 +30,8 @@ try
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
+    QmlInterface data_mgr;
+        engine.rootContext()->setContextProperty("QI", &data_mgr);
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
@@ -36,6 +39,7 @@ try
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
     engine.load(url);
+    rootobj=engine.rootObjects().at(0);
 
     return app.exec();
 }

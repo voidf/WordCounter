@@ -32,9 +32,11 @@ public:
     Q_INVOKABLE void handle_exp(QVariant q)
     {
         QString s = q.toString();
+        std::string handler;
         for (auto i : s)
         {
-            qDebug() << i;
+//            qDebug() << i;
+
         }
     }
     //Q_INVOKABLE void add_rule(QVariant ad); //传列表用QVariantList，键值对用QVariantMap

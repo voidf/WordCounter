@@ -209,6 +209,9 @@ Page {
             width: _base.button_size
             height: _base.button_size
             text: "="
+            onClicked: {
+                QI.handle_exp(tt.text)
+            }
         }
         Button {
             id: b_del

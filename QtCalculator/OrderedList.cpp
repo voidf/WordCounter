@@ -1,3 +1,4 @@
+#define IMPORT_MODULE
 #ifndef ORDEREDLIST_IMPORTED
 #define ORDEREDLIST_IMPORTED
 #include <memory>

@@ -1,3 +1,4 @@
+#define IMPORT_MODULE
 #ifndef BST_IMPORTED
 #define BST_IMPORTED
 #include <memory>

@@ -2,10 +2,10 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 ApplicationWindow {
-    width: 640
-    height: 480
+    width: 1280
+    height: 720
     visible: true
-    title: qsTr("Tabs")
+    title: qsTr("Calc")
 
     SwipeView {
         id: swipeView

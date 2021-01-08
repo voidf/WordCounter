@@ -1,5 +1,6 @@
-#ifndef BST_IMPORTED
-#define BST_IMPORTED
+#define IMPORT_MODULE
+#ifndef BIGINTEGER_IMPORTED
+#define BIGINTEGER_IMPORTED
 #define ENABLE_FFT // 有点危的FFT乘法
 
 #include <iostream>

@@ -1,3 +1,4 @@
+#define IMPORT_MODULE
 #ifndef LINKLIST_IMPORTED
 #define LINKLIST_IMPORTED
 #include <memory>

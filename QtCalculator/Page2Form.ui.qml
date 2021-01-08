@@ -15,4 +15,11 @@ Page {
         text: qsTr("You are on Page 2.")
         anchors.centerIn: parent
     }
+
+    Button {
+        id: button
+        x: 412
+        y: 42
+        //text: qsTr("Button")
+    }
 }

@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Window 2.2
 
 Page {
     width: 1280
@@ -12,8 +13,44 @@ Page {
         padding: 10
         property int button_offset_x: 510
         property int button_offset_y: 20
-        property int button_size: 120
-        property int button_margin: 150
+        property int button_size: 100
+        property int button_margin: 120
+
+        Button {
+            id: b_lparenthese
+            x: _base.button_offset_x + 0 * _base.button_margin
+            y: _base.button_offset_y + 4 * _base.button_margin
+            width: _base.button_size
+            height: _base.button_size
+            text: "("
+            onClicked: {
+                tt.text += "("
+            }
+        }
+
+        Button {
+            id: b_rparenthese
+            x: _base.button_offset_x + 1 * _base.button_margin
+            y: _base.button_offset_y + 4 * _base.button_margin
+            width: _base.button_size
+            height: _base.button_size
+            text: ")"
+            onClicked: {
+                tt.text += ")"
+            }
+        }
+        Button {
+            id: b_mod
+            x: _base.button_offset_x + 4 * _base.button_margin
+            y: _base.button_offset_y + 2 * _base.button_margin
+            width: _base.button_size
+            height: _base.button_size
+            font.pixelSize: Qt.application.font.pixelSize * 2
+            text: "Mod"
+            onClicked: {
+                tt.text += "%"
+            }
+        }
 
         Button {
             id: b7
@@ -239,6 +276,7 @@ Page {
 
     TextEdit {
         id: tt
+        objectName: "input_window"
         x: 20
         y: -30
         width: 500
@@ -247,5 +285,50 @@ Page {
         color: "#ffffff"
         text: ""
         wrapMode: Text.WrapAnywhere
+        Keys.enabled: true
+        Keys.onPressed: {
+            console.log(event.key)
+            switch (event.key) {
+            case 16777221:
+                QI.handle_exp(tt.text)
+                break
+            case 16777220:
+                QI.handle_exp(tt.text)
+                break
+            default:
+                break
+            }
+        }
+        function set_res(s) {
+            console.log(s)
+            text = s
+        }
+    }
+
+    TextEdit {
+        id: calc_result
+        objectName: "calc_result"
+        x: 20
+        y: 300
+        width: 500
+        height: 500
+        font.pixelSize: Qt.application.font.pixelSize * 1.5
+        color: "#ffffff"
+        text: "resHere"
+        wrapMode: Text.WrapAnywhere
+        function warning(msg) {
+            color = "#ff0000"
+            text = msg
+        }
+        function set_res(a1, a2, a3) {
+            console.log(a1)
+            color = "#ffffff"
+            text = '表达式二叉树：
+前序：' + a2 + '
+
+中序：' + a1 + '
+
+后序：' + a3
+        }
     }
 }

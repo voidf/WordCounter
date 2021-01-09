@@ -6,9 +6,13 @@ ApplicationWindow {
     height: 720
     visible: true
     title: qsTr("Calc")
-
+    objectName: "_ROOT"
+    function echofun(aa){
+        console.log(aa)
+    }
     SwipeView {
         id: swipeView
+        objectName: "swipeView"
         anchors.fill: parent
         currentIndex: tabBar.currentIndex
 
@@ -17,6 +21,7 @@ ApplicationWindow {
 
         Page2Form {
         }
+        
     }
 
     footer: TabBar {

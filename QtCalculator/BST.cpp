@@ -123,7 +123,7 @@ namespace BST
         BST() : _len(0)
         {
             _l = static_cast<P>(new Content());
-            _r = _header = _l;
+            _root = _r = _header = _l;
             // _l->lchild = _l;
             // _l->rchild = _l;
         }
@@ -231,7 +231,7 @@ namespace BST
             {
                 this->_l = tmp;
             }
-            if (this->_len == 0)
+            if (this->_header == ptr)
             {
                 // _header->father = tmp;
                 _root = tmp;
@@ -249,7 +249,7 @@ namespace BST
             tmp->father = ptr;
             if (ptr == this->_r)
                 this->_r = tmp;
-            if (this->_len == 0)
+            if (this->_header == ptr)
             {
                 // _header->father = tmp;
                 _root = tmp;
@@ -272,9 +272,9 @@ namespace BST
             tmp->father = ptr;
             if (ptr == this->_l)
                 this->_l = tmp;
-            if (this->_len == 0)
+            if (this->_header == ptr)
             {
-                _header->father = tmp;
+                // _header->father = tmp;
                 _root = tmp;
             }
             this->_len++;
@@ -291,9 +291,9 @@ namespace BST
             tmp->father = ptr;
             if (ptr == this->_r)
                 this->_r = tmp;
-            if (this->_len == 0)
+            if (this->_header == ptr)
             {
-                _header->father = tmp;
+                // _header->father = tmp;
                 _root = tmp;
             }
             this->_len++;
@@ -310,9 +310,9 @@ namespace BST
             tmp->father = ptr;
             if (ptr == this->_l)
                 this->_l = tmp;
-            if (this->_len == 0)
+            if (this->_header == ptr)
             {
-                _header->father = tmp;
+                // _header->father = tmp;
                 _root = tmp;
             }
             this->_len++;
@@ -329,9 +329,9 @@ namespace BST
             tmp->father = ptr;
             if (ptr == this->_r)
                 this->_r = tmp;
-            if (this->_len == 0)
+            if (this->_header == ptr)
             {
-                _header->father = tmp;
+                // _header->father = tmp;
                 _root = tmp;
             }
             this->_len++;

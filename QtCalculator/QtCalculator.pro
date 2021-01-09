@@ -11,7 +11,6 @@ SOURCES += \
         BigInteger.cpp \
         LinkedList.cpp \
         OrderedList.cpp \
-        QmlInterface.cpp \
         main.cpp
 
 RESOURCES += qml.qrc

@@ -15,7 +15,7 @@
 //#include "BigInteger.cpp"
 //#include "BST.cpp"
 //#include "LinkedList.cpp"
-//#include "OrderedList.cpp"
+#include "OrderedList.cpp"
 #include "QmlInterface.h"
 extern QObject* rootobj;
 QObject* rootobj;

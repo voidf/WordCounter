@@ -1,4 +1,4 @@
-#define IMPORT_MODULE
+// #define IMPORT_MODULE
 #ifndef ORDEREDLIST_IMPORTED
 #define ORDEREDLIST_IMPORTED
 #include <memory>
@@ -34,6 +34,11 @@ namespace OrderedList
         Allocator &get_allocator() { return *static_cast<Allocator *>(&this->_allocator); }
 
         OrderedList() : _allocator(){};
+        template <typename... Args>
+        OrderedList(Args &&... args):_allocator()
+        {
+            this->append(args...);
+        };
         ~OrderedList() { std::_Destroy(this->_allocator._start, this->_allocator._finish, get_allocator()); }
         Tp begin() { return this->_allocator._start; }
         Tp end() { return this->_allocator._finish; }
@@ -49,11 +54,23 @@ namespace OrderedList
         }
         void append(const T &x)
         {
-            if (this->_allocator._finish != this->_allocator._end_of_storage)
+            if (this->_allocator._finish == this->_allocator._end_of_storage)
                 house_move();
 
             ACT::construct(this->_allocator, this->_allocator._finish, x);
             ++this->_allocator._finish;
+        }
+        template <typename... Args>
+        void append(const T&x, Args &... args)
+        {
+            this->append(x);
+            this->append(args...);
+        }
+        template <typename... Args>
+        void append(const T&&x, Args &&... args)
+        {
+            this->append(x);
+            this->append(args...);
         }
         void append(T &&x) { direct_append(std::move(x)); }
         T pop()
@@ -116,6 +133,9 @@ struct SB
 signed main()
 try
 {
+    OrderedList::OrderedList<int> V{1, 1, 4, 5, 1, 4};
+    for (auto i : V)
+        std::cout << i;
     OrderedList::OrderedList<SB> stack; // 手造顺序表（搬家表），可以实现栈
     stack.direct_append(1919810LL, 1);
     stack.direct_append(1919810LL, 14);

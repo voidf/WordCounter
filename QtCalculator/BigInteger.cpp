@@ -104,6 +104,17 @@ namespace BigIntegerDomain
         BigInteger &operator*=(const BigInteger &b) { return (*this) = (*this) * b; }
         static std::pair<BigInteger, BigInteger> divide(BigInteger a, BigInteger &b)
         {
+            bool minus_flg = false;
+            if (a.test(a.size() - 1))
+            {
+                minus_flg ^= 1;
+                a = -a;
+            }
+            if (b.test(b.size() - 1))
+            {
+                minus_flg ^= 1;
+                b = -b;
+            }
             BigInteger c(0);
             int i = 0;
             while ((b << (i + 1)) <= a)
@@ -114,6 +125,8 @@ namespace BigIntegerDomain
                     a -= (b << i), c.set(i, 1);
                 i--;
             }
+            if (minus_flg)
+                return std::make_pair(-c, b - a);
             return std::make_pair(c, a);
         }
         BigInteger operator/(BigInteger &b) { return divide(*this, b).first; }

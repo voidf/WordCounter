@@ -54,13 +54,13 @@ namespace LinkedList
             _start = static_cast<P>(new Content());
             _finish = _start;
         }
-        ~LinkedList()
-        {
-            for (auto cur = this->_start; cur != this->_finish; cur++)
-                cur.reset();
-            this->_finish.reset();
-            delete this;
-        }
+        // ~LinkedList()
+        // {
+        //     for (auto cur = this->_start; cur != this->_finish; cur++)
+        //         cur.reset();
+        //     this->_finish.reset();
+        //     delete this;
+        // }
 
         friend P operator++(P &ptr, int)
         {

@@ -42,7 +42,7 @@ ApplicationWindow{
                     font.bold: true
                     anchors.verticalCenter: parent.verticalCenter
                 }
-                Button{
+                Button {
                     property var iid:name
                     font.pixelSize: 16
                     width: co_view.width*0.1

@@ -314,7 +314,7 @@ Page {
         height: 500
         font.pixelSize: Qt.application.font.pixelSize * 1.5
         color: "#ffffff"
-        text: "resHere"
+        text: "result will be showed here"
         wrapMode: Text.WrapAnywhere
         function warning(msg) {
             color = "#ff0000"

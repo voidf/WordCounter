@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include "BigInteger.cpp"
 #include "OrderedList.cpp"
+#include "LinkedList.cpp"
 #include "BST.cpp"
 #include <QJsonDocument>
 #include <QDebug>
@@ -95,9 +96,13 @@ public:
 
                     if (i == ')')
                     {
-                        while (operators.back() != '(')
+                        while (!operators.empty() and operators.back() != '(')
                         {
                             suffix_exp.direct_append(operators.pop(), BigIntegerDomain::BigInteger<256>(), 0.0);
+                        }
+                        if(operators.empty()){
+                            QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant("表达式非法")));
+                            return;
                         }
                         operators.pop();
                     }
@@ -180,6 +185,7 @@ public:
         }
         for (auto &[i, j, k] : suffix_exp)
         {
+            qDebug() << i << " " << j.toDecimal().c_str() << " " << k;
             if (i == 'I' or i == 'F')
                 _calc_stack.direct_append(i, j, k);
             else
@@ -227,6 +233,7 @@ public:
                 }
                 else
                 {
+                    qDebug()<<opra.b.toDecimal().c_str()<<oprb.b.toDecimal().c_str();
                     switch (i)
                     {
                     case '+':
@@ -249,7 +256,7 @@ public:
                     }
                 }
             }
-            //            qDebug() << i << " " << j.toDecimal().c_str() << " " << k;
+            qDebug() << i << " " << j.toDecimal().c_str() << " " << k;
         }
         //        qDebug() << "======";
         QString res;
@@ -298,6 +305,44 @@ public:
         }
 
         QMetaObject::invokeMethod(calc_result, "set_res", Q_ARG(QVariant, a1), Q_ARG(QVariant, a2), Q_ARG(QVariant, a3));
+        QObject *sketch = rootobj->findChild<QObject *>("sketch");
+        QMetaObject::invokeMethod(sketch, "clear_son");
+        LinkedList::LinkedList<std::tuple<std::shared_ptr<BST::BST<MT>::Content>, int, int, int, int>> l;
+        l.append(std::make_tuple(B._root, -1, -1, -1, -1));
+        int dep = 100;
+        while (!l.empty())
+        {
+            auto [cur, curx, cury, px, py] = l.pop();
+//            qDebug() << curx << cury << px << py;
+            QString outputstr;
+            auto &[i, j, k] = *cur;
+            if (i == 'I')
+                outputstr.append(j.toDecimal().c_str());
+            else if (i == 'F')
+                outputstr.append(QString::number(k, 10, 8));
+            else
+                outputstr.append(i);
+            if (px == -1)
+            {
+                px = curx = 800;
+                py = cury = 80;
+                qDebug()<<"SEND:VERTEX:"<<px<<py<<outputstr;
+                QMetaObject::invokeMethod(sketch, "add_son", Q_ARG(QVariant, px), Q_ARG(QVariant, py), Q_ARG(QVariant, outputstr));
+            }
+            else
+            {
+                qDebug()<<"SEND:VERTEX:"<<curx<<cury<<outputstr;
+                QMetaObject::invokeMethod(sketch, "add_son", Q_ARG(QVariant, curx), Q_ARG(QVariant, cury), Q_ARG(QVariant, outputstr));
+                qDebug()<<"SEND:EDGE:"<<curx<<cury<<px<<py;
+                QMetaObject::invokeMethod(sketch, "add_edge", Q_ARG(QVariant, curx), Q_ARG(QVariant, cury), Q_ARG(QVariant, px), Q_ARG(QVariant, py));
+            }
+
+            if (cur->lchild)
+                l.append(std::make_tuple(cur->lchild, curx - 100* 500/(cury + 180)   , cury + dep, curx, cury));
+            if (cur->rchild)
+                l.append(std::make_tuple(cur->rchild, curx + 100* 500/(cury + 180)   , cury + dep, curx, cury));
+        }
+            qDebug() << "DONE";
         //                std::cout << (*a).ii << '\t' << (*a).sbc << std::endl;
     }
     catch (std::exception &e)

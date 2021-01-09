@@ -7,9 +7,7 @@ ApplicationWindow {
     visible: true
     title: qsTr("Calc")
     objectName: "_ROOT"
-    function echofun(aa){
-        console.log(aa)
-    }
+
     SwipeView {
         id: swipeView
         objectName: "swipeView"
@@ -29,10 +27,10 @@ ApplicationWindow {
         currentIndex: swipeView.currentIndex
 
         TabButton {
-            text: qsTr("Page 1")
+            text: qsTr("Calculator")
         }
         TabButton {
-            text: qsTr("Page 2")
+            text: qsTr("Tree-view")
         }
     }
 }

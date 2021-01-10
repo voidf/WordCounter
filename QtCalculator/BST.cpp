@@ -46,6 +46,44 @@ namespace BST
 
         P begin() { return _l; }
         P end() { return _header; }
+        void update_beginnings()
+        {
+            while (_l->lchild)
+                _l = _l->lchild;
+            while (_r->rchild)
+                _r = _r->rchild;
+            if (_header->lchild)
+                _root = _header->lchild;
+            else if (_header->rchild)
+                _root = _header->rchild;
+            _len = 0;
+            for (auto i : *this)
+                _len++;
+        }
+        static P generate_content(T &x)
+        {
+            P tmp(new Content(x));
+            return tmp;
+        }
+
+        // P generate_content(T &&x) {return direct_generate_content(std::move(x))); }
+        template <typename... Args>
+        static P direct_generate_content(Args &&... args)
+        {
+            P tmp(new Content(std::forward<Args>(args)...));
+            return tmp;
+        }
+        static void lconnect(P &parent, P &ptr)
+        {
+            parent->lchild = ptr;
+            ptr->father = parent;
+        }
+        static void rconnect(P &parent, P &ptr)
+        {
+            parent->rchild = ptr;
+            ptr->father = parent;
+        }
+
         P postotbegin()
         {
             P ptr = this->_l;

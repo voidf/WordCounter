@@ -100,7 +100,8 @@ public:
                         {
                             suffix_exp.direct_append(operators.pop(), BigIntegerDomain::BigInteger<256>(), 0.0);
                         }
-                        if(operators.empty()){
+                        if (operators.empty())
+                        {
                             QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant("表达式非法")));
                             return;
                         }
@@ -151,38 +152,59 @@ public:
         }
         while (!operators.empty())
             suffix_exp.direct_append(operators.pop(), BigIntegerDomain::BigInteger<256>(), 0.0);
+
         auto first_build = true;
+        OrderedList::OrderedList<std::shared_ptr<BST::BST<MT>::Content>> _pointer_stack;
         for (auto &[i, j, k] : suffix_exp)
         {
             if (i == 'I' or i == 'F')
-                _calc_stack.direct_append(i, j, k);
+            {
+                //                _calc_stack.direct_append(i, j, k);
+                auto tpp = B.direct_generate_content(i, j, k);
+                _pointer_stack.append(tpp);
+            }
             else
             {
-                if (first_build)
+                //                if (first_build)
+                //                {
+                //                    first_build = false;
+                //                    auto p = B.direct_insert_left(B._header, i, j, k);
+                auto parent = B.direct_generate_content(i, j, k);
+
+                if (_pointer_stack.empty())
                 {
-                    first_build = false;
-                    auto p = B.direct_insert_left(B._header, i, j, k);
-                    if (_calc_stack.empty())
-                    {
-                        QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant("表达式非法")));
-                        return;
-                    }
-                    B.insert_left(p, _calc_stack.pop());
-                    if (_calc_stack.empty())
-                    {
-                        QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant("表达式非法")));
-                        return;
-                    }
-                    B.insert_right(p, _calc_stack.pop());
+                    QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant("表达式非法")));
+                    return;
                 }
-                else
+                auto oprb = _pointer_stack.pop();
+                //                    B.insert_left(p, _calc_stack.pop());
+                if (_pointer_stack.empty())
                 {
-                    auto p = B.direct_insert_left(B._header, i, j, k);
-                    B.insert_right(p, _calc_stack.pop());
+                    QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant("表达式非法")));
+                    return;
                 }
+                auto opra = _pointer_stack.pop();
+                B.lconnect(parent, opra);
+                B.rconnect(parent, oprb);
+                _pointer_stack.append(parent);
+                //                    B.insert_right(p, _calc_stack.pop());
+                //                }
+                //                else
+                //                {
+                //                    auto p = B.direct_insert_left(B._header, i, j, k);
+                //                    B.insert_right(p, _calc_stack.pop());
+                //                }
             }
             //            qDebug() << i << " " << j.toDecimal().c_str() << " " << k;
         }
+        if (_pointer_stack.empty())
+        {
+            QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant("表达式非法")));
+            return;
+        }
+        auto tpp = _pointer_stack.pop();
+        B.lconnect(B._header, tpp);
+        B.update_beginnings();
         for (auto &[i, j, k] : suffix_exp)
         {
             qDebug() << i << " " << j.toDecimal().c_str() << " " << k;
@@ -233,7 +255,7 @@ public:
                 }
                 else
                 {
-                    qDebug()<<opra.b.toDecimal().c_str()<<oprb.b.toDecimal().c_str();
+                    qDebug() << opra.b.toDecimal().c_str() << oprb.b.toDecimal().c_str();
                     switch (i)
                     {
                     case '+':
@@ -313,7 +335,7 @@ public:
         while (!l.empty())
         {
             auto [cur, curx, cury, px, py] = l.pop();
-//            qDebug() << curx << cury << px << py;
+            //            qDebug() << curx << cury << px << py;
             QString outputstr;
             auto &[i, j, k] = *cur;
             if (i == 'I')
@@ -326,23 +348,23 @@ public:
             {
                 px = curx = 800;
                 py = cury = 80;
-                qDebug()<<"SEND:VERTEX:"<<px<<py<<outputstr;
+                qDebug() << "SEND:VERTEX:" << px << py << outputstr;
                 QMetaObject::invokeMethod(sketch, "add_son", Q_ARG(QVariant, px), Q_ARG(QVariant, py), Q_ARG(QVariant, outputstr));
             }
             else
             {
-                qDebug()<<"SEND:VERTEX:"<<curx<<cury<<outputstr;
+                qDebug() << "SEND:VERTEX:" << curx << cury << outputstr;
                 QMetaObject::invokeMethod(sketch, "add_son", Q_ARG(QVariant, curx), Q_ARG(QVariant, cury), Q_ARG(QVariant, outputstr));
-                qDebug()<<"SEND:EDGE:"<<curx<<cury<<px<<py;
+                qDebug() << "SEND:EDGE:" << curx << cury << px << py;
                 QMetaObject::invokeMethod(sketch, "add_edge", Q_ARG(QVariant, curx), Q_ARG(QVariant, cury), Q_ARG(QVariant, px), Q_ARG(QVariant, py));
             }
 
             if (cur->lchild)
-                l.append(std::make_tuple(cur->lchild, curx - 100* 500/(cury + 180)   , cury + dep, curx, cury));
+                l.append(std::make_tuple(cur->lchild, curx - 100 * 500 / (cury + 180), cury + dep, curx, cury));
             if (cur->rchild)
-                l.append(std::make_tuple(cur->rchild, curx + 100* 500/(cury + 180)   , cury + dep, curx, cury));
+                l.append(std::make_tuple(cur->rchild, curx + 100 * 500 / (cury + 180), cury + dep, curx, cury));
         }
-            qDebug() << "DONE";
+        qDebug() << "DONE";
         //                std::cout << (*a).ii << '\t' << (*a).sbc << std::endl;
     }
     catch (std::exception &e)

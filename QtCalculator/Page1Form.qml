@@ -6,6 +6,107 @@ Page {
     width: 1280
     height: 720
 
+
+
+    function calc(){
+        history.append({name:tt.text.trim(),ind:history.count})
+        QI.handle_exp(tt.text)
+    }
+    Component.onCompleted: {
+        history.append({name:"History Here",ind:history.count})
+    }
+    function maintain_r(){
+        for(var i = 0; i < list_root.count; i++)
+        history.setProperty(i,"ind",i);
+    }
+
+    ListView {
+            id: listView
+            x: _base.button_offset_x + 5 * _base.button_margin
+            y: 0
+            width: 300
+            height: 700
+
+//            text:"History"
+
+            delegate: Item {
+                height: 40
+//                anchors.right: parent.right
+                width: parent.width
+//                height: parent.height
+                Row {
+                    id: row1
+                    width: parent.width
+//                    height:50
+                    property var _ind: ind
+                    property var _text: name
+                    Text {
+                        font.pixelSize: Qt.application.font.pixelSize * 1.2
+//                        anchors.centerIn: parent.left
+//                        font.pixelSize: 20
+//                        width: add_rules_menu.width*0.7
+//                        anchors.left: parent.parent.parent.parent.right
+//                        anchors.left: parent.left
+                        color: "#ffffff"
+//                        text: '<font color="#ffffff">'+name+'</font>'
+                        font.bold: true
+                        text: name
+                        Component.onCompleted: {
+                            parent._text = text
+//                            parent._ind = ind
+                        }
+//                        height: 50
+
+//                        focus: true
+//                        onClicked:{
+//                            tt.text = text
+//                        }
+
+//                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                    Button{
+//                        color: "#ffffff"
+                        y:-14
+                        id:bb
+                        anchors.right: parent.right
+                        text: "copy"
+//                        anchors.top: undefined
+//                        anchors.left: undefine
+//                        anchors.right: undefined
+//                        anchors.bottom: undefined
+//                        anchors.verticalCenter: undefined
+
+
+
+//                        anchors.right: parent.parent.right
+
+//                        anchors.verticalCenter: parent.right
+                        onClicked: {
+                            tt.text = parent._text
+                        }
+                    }
+                    Button{
+//                        height: 50
+                        y:-14
+                        anchors.right: bb.left
+
+//                        anchors.right: parent.right
+//                        color: "#ffffff"
+                        text: "remove"
+                        onClicked: {
+                            history.remove(parent._ind)
+                            maintain_r()
+//                            console.log(parent._ind)
+//                            console.log(parent._text)
+                        }
+                    }
+                }
+            }
+            model:ListModel {
+                id: history
+            }
+        }
+
     header: Label {
         id: _base
         //        text: qsTr("Page 1")
@@ -13,8 +114,9 @@ Page {
         padding: 10
         property int button_offset_x: 510
         property int button_offset_y: 20
-        property int button_size: 100
-        property int button_margin: 120
+        property int button_size: 80
+        property int button_margin: 90
+
 
         Button {
             id: b_lparenthese
@@ -247,7 +349,7 @@ Page {
             height: _base.button_size
             text: "="
             onClicked: {
-                QI.handle_exp(tt.text)
+                calc()
             }
         }
         Button {
@@ -290,10 +392,12 @@ Page {
             console.log(event.key)
             switch (event.key) {
             case 16777221:
-                QI.handle_exp(tt.text)
+//                QI.handle_exp(tt.text)
+                calc()
                 break
             case 16777220:
-                QI.handle_exp(tt.text)
+//                QI.handle_exp(tt.text)
+                calc()
                 break
             default:
                 break

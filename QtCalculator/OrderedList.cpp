@@ -79,6 +79,10 @@ namespace OrderedList
             ACT::destroy(this->_allocator, this->_allocator._finish);
             return tmp;
         }
+        void remove_back()
+        {
+            ACT::destroy(this->_allocator, this->_allocator._finish);
+        }
 
         template <typename... Args>
         void direct_append(Args &&... args)
@@ -92,7 +96,7 @@ namespace OrderedList
 
         void deallocate(Tp _obj_pointer, size_t _count)
         {
-            if (_allocator, _obj_pointer)
+            if (_obj_pointer)
                 ACT::deallocate(_allocator, _obj_pointer, _count);
         }
         template <typename T1, typename... Args>

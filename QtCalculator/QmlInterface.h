@@ -16,44 +16,81 @@
 #include <QUrl>
 #include <QVariant>
 
-struct MT
+struct __Base
 {
-    char a;
-    BigIntegerDomain::BigInteger<256> b;
-    double c;
-    //    MT(const char _a,BigIntegerDomain::BigInteger<256> &_b, double _c):a(_a),b(_b),c(_c){}
-    MT(char _a, BigIntegerDomain::BigInteger<256> &_b, double _c) : a(_a), b(_b), c(_c) {}
-    MT(char &&_a, BigIntegerDomain::BigInteger<256> &&_b, double _c) : a(_a), b(_b), c(_c) {}
-    MT() : a(0), b(0), c(0) {}
+    char _type;
+    __Base(char t) : _type(t) {}
+    virtual ~__Base() = default;
 };
+
+template <typename T>
+struct _wrapper : __Base
+{
+    T _content;
+    _wrapper(char _t) : __Base(_t){}
+    _wrapper(char _t, T &_c) : __Base(_t), _content(_c) {}
+    _wrapper(char _t, T &&_c) : __Base(_t), _content(_c) {}
+};
+
+
+using I256 = BigIntegerDomain::BigInteger<256>;
+using VPtr = std::shared_ptr<__Base>;
+#define vector OrderedList::OrderedList // 所以还是用自己的
+#define list LinkedList::LinkedList
+#define getI(a) dynamic_cast<_wrapper<I256>*>(a.get())->_content
+#define getF(a) dynamic_cast<_wrapper<double>*>(a.get())->_content
+#define I2str(a) dynamic_cast<_wrapper<I256>*>(a.get())->_content.toDecimal().c_str() // 参数是VPtr
+#define F2str(a) QString::number(dynamic_cast<_wrapper<double>*>(a.get())->_content,10,8)
+
+
+//struct MT
+//{
+//    char a;
+//    BigIntegerDomain::BigInteger<256> b;
+//    double c;
+//    //    MT(const char _a,BigIntegerDomain::BigInteger<256> &_b, double _c):a(_a),b(_b),c(_c){}
+//    MT(char _a, BigIntegerDomain::BigInteger<256> &_b, double _c) : a(_a), b(_b), c(_c) {}
+//    MT(char &&_a, BigIntegerDomain::BigInteger<256> &&_b, double _c) : a(_a), b(_b), c(_c) {}
+//    MT() : a(0), b(0), c(0) {}
+//};
 
 extern QObject *rootobj;
 class QmlInterface : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString _query_expression READ rfurl WRITE wfurl)
-    //    Q_PROPERTY(QString _default_codec READ rdc WRITE wdc)
 
 public:
     explicit QmlInterface(QObject *parent = nullptr) : QObject(parent) {}
-
     QString rfurl() const { return _query_expression; }
     void wfurl(QString s) { _query_expression = s; }
+    void echo_wrapper(VPtr &_p)
+    {
+        if (_p->_type == 'I')
+            qDebug()<<dynamic_cast<_wrapper<I256>*>(_p.get())->_content.toDecimal().c_str();
+    //        qDebug()<<I2str(_p);
+        else if(_p->_type == 'F')
+            qDebug()<<dynamic_cast<_wrapper<double>*>(_p.get())->_content;
+    //        qDebug()<<F2str(_p);
+        else
+            qDebug()<<_p->_type;
+    }
 
-    //    QString rdc() const { return _default_codec; }
-    //    void wdc(QString tdc) { _default_codec = tdc; }
 
 public:
     Q_INVOKABLE void handle_exp(QVariant q)
     try
     {
-        QString s = q.toString().simplified();
+        QString s = q.toString().simplified()
+                .replace(QString("（"),QString("("))
+                .replace(QString("）"),QString(")"))
+                .replace(QString(" "),QString(""));
         auto minus_tag = false;
         auto float_tag = false;
-        OrderedList::OrderedList<MT> suffix_exp;
-        OrderedList::OrderedList<MT> _calc_stack;
-        OrderedList::OrderedList<char> operators;
-        BST::BST<MT> B;
+        vector<VPtr> suffix_exp;
+        vector<VPtr> _calc_stack;
+        vector<char> operators;
+        BST::BST<VPtr> B;
 
         std::string handler;
         auto calc_result = rootobj->findChild<QObject *>("calc_result");
@@ -79,16 +116,18 @@ public:
                             double cur = strtod(handler.c_str(), &p);
                             if (minus_tag)
                                 cur = -cur;
-                            suffix_exp.direct_append('F', BigIntegerDomain::BigInteger<256>(), cur);
+                            suffix_exp.append(VPtr(new _wrapper<double>('F', cur)));
+//                            suffix_exp.direct_append('F', BigIntegerDomain::BigInteger<256>(), cur);
                         }
                         else
                         {
-                            BigIntegerDomain::BigInteger<256> cur;
+                            I256 cur;
                             cur.fromDecimal(handler);
                             qDebug() << cur.toDecimal().c_str();
                             if (minus_tag)
                                 cur = -cur;
-                            suffix_exp.direct_append('I', cur, 0.0);
+                            suffix_exp.append(VPtr(new _wrapper<I256>('I',cur)));
+//                            suffix_exp.direct_append('I', cur, 0.0);
                         }
                         float_tag = minus_tag = false;
                         handler.clear();
@@ -98,11 +137,15 @@ public:
                     {
                         while (!operators.empty() and operators.back() != '(')
                         {
-                            suffix_exp.direct_append(operators.pop(), BigIntegerDomain::BigInteger<256>(), 0.0);
+                            suffix_exp.append(VPtr(new _wrapper<char>(operators.pop())));
+//                            suffix_exp.direct_append(operators.pop(), BigIntegerDomain::BigInteger<256>(), 0.0);
                         }
                         if (operators.empty())
                         {
-                            QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant("表达式非法")));
+                            QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant(
+                                "【运行错误】操作符栈为空但正要弹栈"
+                                "请检查表达式"
+                            )));
                             return;
                         }
                         operators.pop();
@@ -115,7 +158,8 @@ public:
                     {
                         while (!operators.empty() and _operator_priority[operators.back()] >= _operator_priority[i.toLatin1()])
                         {
-                            suffix_exp.direct_append(operators.pop(), BigIntegerDomain::BigInteger<256>(), 0.0);
+                            suffix_exp.append(VPtr(new _wrapper<char>(operators.pop())));
+//                            suffix_exp.direct_append(operators.pop(), BigIntegerDomain::BigInteger<256>(), 0.0);
                         }
                         operators.direct_append(i.toLatin1());
                     }
@@ -137,199 +181,229 @@ public:
                 double cur = strtod(handler.c_str(), &p);
                 if (minus_tag)
                     cur = -cur;
-                suffix_exp.direct_append('F', BigIntegerDomain::BigInteger<256>(), cur);
+//                suffix_exp.direct_append('F', BigIntegerDomain::BigInteger<256>(), cur);
+                suffix_exp.append(VPtr(new _wrapper<double>('F', cur)));
+
             }
             else
             {
-                BigIntegerDomain::BigInteger<256> cur;
+                I256 cur;
                 cur.fromDecimal(handler);
                 if (minus_tag)
                     cur = -cur;
-                suffix_exp.direct_append('I', cur, 0.0);
+                suffix_exp.append(VPtr(new _wrapper<I256>('I',cur)));
+//                suffix_exp.direct_append('I', cur, 0.0);
             }
             float_tag = minus_tag = false;
             handler.clear();
         }
         while (!operators.empty())
-            suffix_exp.direct_append(operators.pop(), BigIntegerDomain::BigInteger<256>(), 0.0);
+            suffix_exp.append(VPtr(new _wrapper<char>(operators.pop())));
+//            suffix_exp.direct_append(operators.pop(), BigIntegerDomain::BigInteger<256>(), 0.0);
 
-        auto first_build = true;
-        OrderedList::OrderedList<std::shared_ptr<BST::BST<MT>::Content>> _pointer_stack;
-        for (auto &[i, j, k] : suffix_exp)
+        vector<std::shared_ptr<BST::BST<VPtr>::Content>> _pointer_stack;
+        for (auto &i : suffix_exp)
         {
-            if (i == 'I' or i == 'F')
+            if (i->_type == 'I' or i->_type == 'F')
             {
                 //                _calc_stack.direct_append(i, j, k);
-                auto tpp = B.direct_generate_content(i, j, k);
+//                auto tpp = B.direct_generate_content(i, j, k);
+                auto tpp = B.generate_content(i);
                 _pointer_stack.append(tpp);
             }
             else
             {
-                //                if (first_build)
-                //                {
-                //                    first_build = false;
-                //                    auto p = B.direct_insert_left(B._header, i, j, k);
-                auto parent = B.direct_generate_content(i, j, k);
+
+//                auto parent = B.direct_generate_content(i, j, k);
+                auto parent = B.generate_content(i);
 
                 if (_pointer_stack.empty())
                 {
-                    QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant("表达式非法")));
+                    QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant(
+                        "【运行错误】_pointer_stack为空但正要弹栈(B)"
+                        "你是不是往表达式里塞了一堆运算符？"
+                    )));
                     return;
                 }
                 auto oprb = _pointer_stack.pop();
-                //                    B.insert_left(p, _calc_stack.pop());
                 if (_pointer_stack.empty())
                 {
-                    QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant("表达式非法")));
+                    QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant(
+                        "【运行错误】_pointer_stack为空但正要弹栈(A)"
+                        "你是不是往表达式里塞了一堆运算符？"
+                    )));
                     return;
                 }
                 auto opra = _pointer_stack.pop();
                 B.lconnect(parent, opra);
                 B.rconnect(parent, oprb);
                 _pointer_stack.append(parent);
-                //                    B.insert_right(p, _calc_stack.pop());
-                //                }
-                //                else
-                //                {
-                //                    auto p = B.direct_insert_left(B._header, i, j, k);
-                //                    B.insert_right(p, _calc_stack.pop());
-                //                }
             }
-            //            qDebug() << i << " " << j.toDecimal().c_str() << " " << k;
         }
         if (_pointer_stack.empty())
         {
-            QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant("表达式非法")));
-            return;
+            QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant(
+                "【运行错误】_pointer_stack为空但正要弹栈(tpp)"
+                "你是不是往表达式里塞了一堆运算符？"
+            )));
         }
         auto tpp = _pointer_stack.pop();
         B.lconnect(B._header, tpp);
         B.update_beginnings();
-        for (auto &[i, j, k] : suffix_exp)
+        for (auto &i : suffix_exp)
         {
-            qDebug() << i << " " << j.toDecimal().c_str() << " " << k;
-            if (i == 'I' or i == 'F')
-                _calc_stack.direct_append(i, j, k);
+//            qDebug() << i << " " << j.toDecimal().c_str() << " " << k;
+            qDebug("from 249");
+            echo_wrapper(i);
+            if (i->_type == 'I' or i->_type == 'F')
+                _calc_stack.append(i);
+//                _calc_stack.direct_append(i, j, k);
             else
             {
                 if (_calc_stack.empty())
                 {
-                    QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant("表达式非法")));
+                    QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant(
+                        "【运行错误】_calc_stack为空但正要弹栈(259)"
+                        "你是不是往表达式里塞什么不可计算的东西？"
+                    )));
                     return;
                 }
                 auto oprb = _calc_stack.pop();
                 if (_calc_stack.empty())
                 {
-                    QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant("表达式非法")));
+                    QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant(
+                        "【运行错误】_calc_stack为空但正要弹栈(268)"
+                        "你是不是往表达式里塞什么不可计算的东西？"
+                    )));
                     return;
                 }
                 auto opra = _calc_stack.pop();
-                if (oprb.a == 'F' or oprb.a == 'F')
+                if (opra->_type == 'F' or oprb->_type == 'F')
                 {
-                    double __a = 0, __b = 0;
-                    if (opra.a == 'F' and oprb.a == 'F')
-                        __a = opra.c, __b = oprb.c;
-                    else if (opra.a == 'F' and oprb.a == 'I')
-                        __a = opra.c, __b = oprb.b.toDouble();
-                    else if (opra.a == 'I' and oprb.a == 'F')
-                        __a = opra.b.toDouble(), __b = oprb.c;
-                    else
-                        __a = opra.b.toDouble(), __b = oprb.b.toDouble();
-                    switch (i)
+                    double __a = (
+                        opra->_type=='F'?
+                        dynamic_cast<_wrapper<double>*>(opra.get())->_content:
+                        dynamic_cast<_wrapper<I256>*>(opra.get())->_content.toDouble()
+                    ),     __b = (
+                        oprb->_type=='F'?
+                        dynamic_cast<_wrapper<double>*>(oprb.get())->_content:
+                        dynamic_cast<_wrapper<I256>*>(oprb.get())->_content.toDouble()
+                    );
+//                    if (opra.a == 'F' and oprb.a == 'F')
+//                        __a = opra.c, __b = oprb.c;
+//                    else if (opra.a == 'F' and oprb.a == 'I')
+//                        __a = opra.c, __b = oprb.b.toDouble();
+//                    else if (opra.a == 'I' and oprb.a == 'F')
+//                        __a = opra.b.toDouble(), __b = oprb.c;
+//                    else
+//                        __a = opra.b.toDouble(), __b = oprb.b.toDouble();
+                    double __res;
+                    switch (i->_type)
                     {
                     case '+':
-                        _calc_stack.direct_append('F', j, __a + __b);
+//                        _calc_stack.direct_append('F', j, __a + __b);
+                        __res = __a + __b;
                         break;
                     case '-':
-                        _calc_stack.direct_append('F', j, __a - __b);
+//                        _calc_stack.direct_append('F', j, __a - __b);
+                        __res = __a - __b;
                         break;
                     case '*':
-                        _calc_stack.direct_append('F', j, __a * __b);
+//                        _calc_stack.direct_append('F', j, __a * __b);
+                        __res = __a * __b;
                         break;
                     case '/':
-                        _calc_stack.direct_append('F', j, __a / __b);
+//                        _calc_stack.direct_append('F', j, __a / __b);
+                        __res = __a / __b;
                         break;
                     default:
                         break;
                     }
+                    _calc_stack.append(VPtr(new _wrapper<double>('F',__res)));
                 }
                 else
                 {
-                    qDebug() << opra.b.toDecimal().c_str() << oprb.b.toDecimal().c_str();
-                    switch (i)
+//                    qDebug() << opra.b.toDecimal().c_str() << oprb.b.toDecimal().c_str();
+                    qDebug("from 320");
+                    echo_wrapper(opra);
+                    echo_wrapper(oprb);
+                    switch (i->_type)
                     {
                     case '+':
-                        _calc_stack.direct_append('I', opra.b + oprb.b, k);
+                        _calc_stack.append(VPtr(new _wrapper<I256>('I', dynamic_cast<_wrapper<I256>*>(opra.get())->_content + dynamic_cast<_wrapper<I256>*>(oprb.get())->_content)));
                         break;
                     case '-':
-                        _calc_stack.direct_append('I', opra.b - oprb.b, k);
+                        _calc_stack.append(VPtr(new _wrapper<I256>('I', dynamic_cast<_wrapper<I256>*>(opra.get())->_content - dynamic_cast<_wrapper<I256>*>(oprb.get())->_content)));
                         break;
                     case '*':
-                        _calc_stack.direct_append('I', opra.b * oprb.b, k);
+                        _calc_stack.append(VPtr(new _wrapper<I256>('I', dynamic_cast<_wrapper<I256>*>(opra.get())->_content * dynamic_cast<_wrapper<I256>*>(oprb.get())->_content)));
                         break;
                     case '/':
-                        _calc_stack.direct_append('I', opra.b / oprb.b, k);
+                        _calc_stack.append(VPtr(new _wrapper<I256>('I', dynamic_cast<_wrapper<I256>*>(opra.get())->_content / dynamic_cast<_wrapper<I256>*>(oprb.get())->_content)));
                         break;
                     case '%':
-                        _calc_stack.direct_append('I', opra.b % oprb.b, k);
+                        _calc_stack.append(VPtr(new _wrapper<I256>('I', dynamic_cast<_wrapper<I256>*>(opra.get())->_content % dynamic_cast<_wrapper<I256>*>(oprb.get())->_content)));
                         break;
                     default:
                         break;
                     }
                 }
             }
-            qDebug() << i << " " << j.toDecimal().c_str() << " " << k;
+            qDebug("from 345");
+            echo_wrapper(i);
         }
         //        qDebug() << "======";
         QString res;
-        if (_calc_stack.back().a == 'I')
-            res.append(_calc_stack.back().b.toDecimal().c_str());
+        if (_calc_stack.back()->_type == 'I')
+            res.append(I2str(_calc_stack.back()));
         else
-            res = QString::number(_calc_stack.back().c, 10, 8);
+            res = F2str(_calc_stack.back());
+//            res = QString::number(_calc_stack.back().c, 10, 8);
 
         QObject *view_area = rootobj->findChild<QObject *>("input_window");
         qDebug() << res;
         QVariant fst(res);
         QMetaObject::invokeMethod(view_area, "set_res", Q_ARG(QVariant, fst));
         QString a1, a2, a3;
-        for (auto &[i, j, k] : B)
+        for (auto &i : B)
         {
             //            qDebug() << i << " " << j.toDecimal().c_str() << " " << k;
-            if (i == 'I')
-                a1.append(j.toDecimal().c_str());
-            else if (i == 'F')
-                a1.append(QString::number(k, 10, 8));
+            if (i->_type == 'I')
+                a1.append(I2str(i));
+//                a1.append(j.toDecimal().c_str());
+            else if (i->_type == 'F')
+                a1.append(F2str(i));
             else
-                a1.append(i);
+                a1.append(i->_type);
             a1.append(' ');
         }
         for (auto a = B.preotbegin(); a != B.end(); B.preotmove(a))
         {
-            auto &[i, j, k] = *a;
-            if (i == 'I')
-                a2.append(j.toDecimal().c_str());
-            else if (i == 'F')
-                a2.append(QString::number(k, 10, 8));
+            auto &i = *a;
+            if (i->_type == 'I')
+                a2.append(I2str(i));
+            else if (i->_type == 'F')
+                a2.append(F2str(i));
             else
-                a2.append(i);
+                a2.append(i->_type);
             a2.append(' ');
         }
         for (auto a = B.postotbegin(); a != B.end(); B.postotmove(a))
         {
-            auto &[i, j, k] = *a;
-            if (i == 'I')
-                a3.append(j.toDecimal().c_str());
-            else if (i == 'F')
-                a3.append(QString::number(k, 10, 8));
+            auto &i = *a;
+            if (i->_type == 'I')
+                a3.append(I2str(i));
+            else if (i->_type == 'F')
+                a3.append(F2str(i));
             else
-                a3.append(i);
+                a3.append(i->_type);
             a3.append(' ');
         }
 
         QMetaObject::invokeMethod(calc_result, "set_res", Q_ARG(QVariant, a1), Q_ARG(QVariant, a2), Q_ARG(QVariant, a3));
         QObject *sketch = rootobj->findChild<QObject *>("sketch");
         QMetaObject::invokeMethod(sketch, "clear_son");
-        LinkedList::LinkedList<std::tuple<std::shared_ptr<BST::BST<MT>::Content>, int, int, int, int>> l;
+        list<std::tuple<std::shared_ptr<BST::BST<VPtr>::Content>, int, int, int, int>> l;
         l.append(std::make_tuple(B._root, -1, -1, -1, -1));
         int dep = 100;
         while (!l.empty())
@@ -337,13 +411,13 @@ public:
             auto [cur, curx, cury, px, py] = l.pop();
             //            qDebug() << curx << cury << px << py;
             QString outputstr;
-            auto &[i, j, k] = *cur;
-            if (i == 'I')
-                outputstr.append(j.toDecimal().c_str());
-            else if (i == 'F')
-                outputstr.append(QString::number(k, 10, 8));
+            auto &i = *cur;
+            if (i->_type == 'I')
+                outputstr.append(I2str(i));
+            else if (i->_type == 'F')
+                outputstr.append(F2str(i));
             else
-                outputstr.append(i);
+                outputstr.append(i->_type);
             if (px == -1)
             {
                 px = curx = 800;

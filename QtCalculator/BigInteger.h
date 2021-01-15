@@ -233,13 +233,7 @@ namespace BigIntegerDomain
             for (auto i = 0; i <= limit; i++)
                 a[i] *= b[i];
             FFT(a, limit, -1, rev); // 1是FFT变化，-1是逆变换
-            // for (auto i = limit; i >= 0; i--)
-            // {
-            //     if (c[i] == 0 and zerofliter == 0) // 去前导零
-            //         continue;
-            //     zerofliter = true;
-            //     output[outputPtr++] = c[i] ^ 0x30;
-            // }
+
             for (LL i = limit; i > 0; i--)
             {
                 a[i] = static_cast<int>(a[i].real() / limit + 0.5);

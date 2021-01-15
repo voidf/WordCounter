@@ -57,10 +57,15 @@ namespace BST
             else if (_header->rchild)
                 _root = _header->rchild;
             _len = 0;
-            for (auto i : *this)
+            for (auto &i : *this)
                 _len++;
         }
         static P generate_content(T &x)
+        {
+            P tmp(new Content(x));
+            return tmp;
+        }
+        static P generate_content(T &&x)
         {
             P tmp(new Content(x));
             return tmp;
@@ -137,17 +142,17 @@ namespace BST
                 {
                     while (ptr->father and ptr->father->rchild == ptr)
                         ptr = ptr->father;
-                    ptr = ptr->father;
-                    while (ptr->father and ptr == ptr->father->lchild)
+                    //                    ptr = ptr->father;
+                    do
                     {
+                        ptr = ptr->father;
                         if (ptr->rchild)
                         {
                             ptr = ptr->rchild;
                             flg = false;
                             break;
                         }
-                        ptr = ptr->father;
-                    }
+                    } while (ptr->father and ptr == ptr->father->lchild);
                     if (ptr == _header) // 走到end，终点退出
                         break;
                 }

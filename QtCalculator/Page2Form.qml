@@ -56,24 +56,24 @@ Page {
             clear_son()
         }
     }
-    Button {
-        id: b_vertex
-        x: _tree_canvas.button_offset_x + 0 * _tree_canvas.button_margin
-        y: _tree_canvas.button_offset_y + 2 * _tree_canvas.button_margin
+//    Button {
+//        id: b_vertex
+//        x: _tree_canvas.button_offset_x + 0 * _tree_canvas.button_margin
+//        y: _tree_canvas.button_offset_y + 2 * _tree_canvas.button_margin
 
-        text: "ADD"
-        onClicked: {
-            add_son(11,45,"14")
-        }
-    }
-    Button {
-        id: b_edge
-        x: _tree_canvas.button_offset_x + 0 * _tree_canvas.button_margin
-        y: _tree_canvas.button_offset_y + 3 * _tree_canvas.button_margin
+//        text: "ADD"
+//        onClicked: {
+//            add_son(11,45,"14")
+//        }
+//    }
+//    Button {
+//        id: b_edge
+//        x: _tree_canvas.button_offset_x + 0 * _tree_canvas.button_margin
+//        y: _tree_canvas.button_offset_y + 3 * _tree_canvas.button_margin
 
-        text: "EDGE"
-        onClicked: {
-            add_edge(746,280,608,180)
-        }
-    }
+//        text: "EDGE"
+//        onClicked: {
+//            add_edge(746,280,608,180)
+//        }
+//    }
 }

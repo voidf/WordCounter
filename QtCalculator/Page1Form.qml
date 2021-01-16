@@ -16,7 +16,7 @@ Page {
         history.append({name:"History Here",ind:history.count})
     }
     function maintain_r(){
-        for(var i = 0; i < list_root.count; i++)
+        for(var i = 0; i < history.count; i++)
         history.setProperty(i,"ind",i);
     }
 
@@ -49,6 +49,7 @@ Page {
 //                        anchors.left: parent.left
                         color: "#ffffff"
 //                        text: '<font color="#ffffff">'+name+'</font>'
+                        wrapMode: Text.WrapAnywhere
                         font.bold: true
                         text: name
                         Component.onCompleted: {

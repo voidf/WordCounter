@@ -81,10 +81,18 @@ public:
     Q_INVOKABLE void handle_exp(QVariant q)
     try
     {
+        auto calc_result = rootobj->findChild<QObject *>("calc_result");
         QString s = q.toString().simplified()
                 .replace(QString("（"),QString("("))
                 .replace(QString("）"),QString(")"))
                 .replace(QString(" "),QString(""));
+        if(!s.length())
+        {
+            QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant(
+                "【运行错误】你没输入表达式哥哥！"
+            )));
+            return;
+        }
         auto minus_tag = false;
         auto float_tag = false;
         vector<VPtr> suffix_exp;
@@ -93,7 +101,7 @@ public:
         BST::BST<VPtr> B;
 
         std::string handler;
-        auto calc_result = rootobj->findChild<QObject *>("calc_result");
+
         for (auto i : s)
         {
             //            qDebug() << i;
@@ -143,7 +151,7 @@ public:
                         if (operators.empty())
                         {
                             QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant(
-                                "【运行错误】操作符栈为空但正要弹栈"
+                                "【运行错误】操作符栈为空但正要弹栈(146)\n"
                                 "请检查表达式"
                             )));
                             return;
@@ -220,7 +228,7 @@ public:
                 if (_pointer_stack.empty())
                 {
                     QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant(
-                        "【运行错误】_pointer_stack为空但正要弹栈(B)"
+                        "【运行错误】_pointer_stack为空但正要弹栈(B)\n"
                         "你是不是往表达式里塞了一堆运算符？"
                     )));
                     return;
@@ -229,7 +237,7 @@ public:
                 if (_pointer_stack.empty())
                 {
                     QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant(
-                        "【运行错误】_pointer_stack为空但正要弹栈(A)"
+                        "【运行错误】_pointer_stack为空但正要弹栈(A)\n"
                         "你是不是往表达式里塞了一堆运算符？"
                     )));
                     return;
@@ -243,9 +251,11 @@ public:
         if (_pointer_stack.empty())
         {
             QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant(
-                "【运行错误】_pointer_stack为空但正要弹栈(tpp)"
-                "你是不是往表达式里塞了一堆运算符？"
+                "【运行错误】_pointer_stack为空但正要弹栈(246)\n"
+                "你是不是往表达式里塞了一堆运算符？\n"
+                "还是少打了操作数？"
             )));
+            return;
         }
         auto tpp = _pointer_stack.pop();
         B.lconnect(B._header, tpp);
@@ -263,7 +273,7 @@ public:
                 if (_calc_stack.empty())
                 {
                     QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant(
-                        "【运行错误】_calc_stack为空但正要弹栈(259)"
+                        "【运行错误】_calc_stack为空但正要弹栈(259)\n"
                         "你是不是往表达式里塞什么不可计算的东西？"
                     )));
                     return;
@@ -272,7 +282,7 @@ public:
                 if (_calc_stack.empty())
                 {
                     QMetaObject::invokeMethod(calc_result, "warning", Q_ARG(QVariant, QVariant(
-                        "【运行错误】_calc_stack为空但正要弹栈(268)"
+                        "【运行错误】_calc_stack为空但正要弹栈(268)\n"
                         "你是不是往表达式里塞什么不可计算的东西？"
                     )));
                     return;
@@ -349,7 +359,7 @@ public:
                     }
                 }
             }
-            qDebug("from 345");
+            qDebug("from 352");
             echo_wrapper(i);
         }
         //        qDebug() << "======";
@@ -405,7 +415,7 @@ public:
         QMetaObject::invokeMethod(sketch, "clear_son");
         list<std::tuple<std::shared_ptr<BST::BST<VPtr>::Content>, int, int, int, int>> l;
         l.append(std::make_tuple(B._root, -1, -1, -1, -1));
-        int dep = 100;
+        int dep = 80;
         while (!l.empty())
         {
             auto [cur, curx, cury, px, py] = l.pop();
@@ -421,7 +431,7 @@ public:
             if (px == -1)
             {
                 px = curx = 800;
-                py = cury = 80;
+                py = cury = 20;
                 qDebug() << "SEND:VERTEX:" << px << py << outputstr;
                 QMetaObject::invokeMethod(sketch, "add_son", Q_ARG(QVariant, px), Q_ARG(QVariant, py), Q_ARG(QVariant, outputstr));
             }

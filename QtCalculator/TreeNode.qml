@@ -9,8 +9,8 @@ Label {
     id: rec
     width: 200
     height: 50
-    font.pixelSize: Qt.application.font.pixelSize * 4
-
+    font.pixelSize: Qt.application.font.pixelSize * 2.6
+    wrapMode: Text.WrapAnywhere
 
 //    text:"233"
 //    color: "#ff0000"

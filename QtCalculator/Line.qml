@@ -5,7 +5,7 @@ Rectangle {
     id:line
     property point point1: Qt.point(100,400)
     property point point2: Qt.point(240,200)
-    property int lineWidth: 4
+    property int lineWidth: 3
     property var lineColor: "#777777"
 
 

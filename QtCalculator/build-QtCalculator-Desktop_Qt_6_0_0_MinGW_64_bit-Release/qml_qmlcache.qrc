@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<RCC>
+    <qresource prefix="/">
+        <file alias="main.qml">../main.qml</file>
+        <file alias="Page1Form.qml">../Page1Form.qml</file>
+        <file alias="Page2Form.qml">../Page2Form.qml</file>
+        <file alias="qtquickcontrols2.conf">../qtquickcontrols2.conf</file>
+        <file alias="TreeNode.qml">../TreeNode.qml</file>
+        <file alias="Line.qml">../Line.qml</file>
+    </qresource>
+</RCC>

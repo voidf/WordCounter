@@ -102,7 +102,7 @@ namespace BigIntegerDomain
         friend double operator*(double b, BigInteger &a) { return a.toDouble() * b; }
         friend double operator*(double b, BigInteger &&a) { return a.toDouble() * b; }
         BigInteger &operator*=(const BigInteger &b) { return (*this) = (*this) * b; }
-        static std::pair<BigInteger, BigInteger> divide(BigInteger a, BigInteger &b)
+        static std::pair<BigInteger, BigInteger> divide(BigInteger a, BigInteger b)
         {
             bool minus_flg = false;
             if (a.test(a.size() - 1))
